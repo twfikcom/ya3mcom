@@ -82,17 +82,41 @@ const App: React.FC = () => {
       return;
     }
     setIsSubmitting(true);
-    setTimeout(() => {
-      setShowSuccess(true);
-      setTimeout(() => {
-        setShowSuccess(false);
-        setIsGlobalSummaryOpen(false);
-        setSandwichState({ quantities: {}, hasSecretSauce: false, breadChoices: {} });
-        setTrayState({ quantities: {} });
-        setSweetState({ quantities: {} });
+    
+    try {
+      // Formspree Submission via fetch as requested in earlier steps
+      const orderDetails = fullOrderSummary.map(i => `- ${i.name} (${i.quantity}) ${i.bread ? `[خبز ${i.bread === 'baladi' ? 'بلدي' : 'فينو'}]` : ''}`).join('\n');
+      const response = await fetch("https://formspree.io/f/xdazllep", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+            الاسم: userInfo.name,
+            التليفون: userInfo.phone,
+            العنوان: userInfo.address,
+            الطلب: orderDetails,
+            الإجمالي: globalTotal + " ج.م"
+        })
+      });
+
+      if (response.ok) {
+        setShowSuccess(true);
+        setTimeout(() => {
+          setShowSuccess(false);
+          setIsGlobalSummaryOpen(false);
+          setSandwichState({ quantities: {}, hasSecretSauce: false, breadChoices: {} });
+          setTrayState({ quantities: {} });
+          setSweetState({ quantities: {} });
+          setUserInfo({ name: '', phone: '', address: '' });
+          setIsSubmitting(false);
+        }, 4000);
+      } else {
+        alert('يا عم حصل غلط في الإرسال، جرب تاني!');
         setIsSubmitting(false);
-      }, 3000);
-    }, 1500);
+      }
+    } catch (err) {
+      alert('يا عم النت فيه مشكلة، جرب تاني!');
+      setIsSubmitting(false);
+    }
   };
 
   const totalItemCount = useMemo(() => {
@@ -101,7 +125,7 @@ const App: React.FC = () => {
   }, [sandwichState, trayState, sweetState]);
 
   return (
-    <div className="min-h-screen bg-black text-white font-['Cairo'] relative selection:bg-[#FAB520] selection:text-black overflow-x-hidden">
+    <div className="min-h-screen bg-black text-white font-['Changa'] relative selection:bg-[#FAB520] selection:text-black overflow-x-hidden">
       
       {/* Background Entertainment Layer */}
       <div className="fixed inset-0 pointer-events-none z-0">
@@ -117,7 +141,7 @@ const App: React.FC = () => {
           <motion.h2 
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            className="text-3xl md:text-5xl font-black text-center mb-12 text-[#FAB520] drop-shadow-[0_0_20px_rgba(250,181,32,0.5)]"
+            className="text-4xl md:text-6xl font-normal text-center mb-12 text-[#FAB520] drop-shadow-[0_0_20px_rgba(250,181,32,0.5)] font-['Lalezar']"
           >
             عايز تاكل إيه يا عم؟ 🤤
           </motion.h2>
@@ -139,36 +163,43 @@ const App: React.FC = () => {
               >
                 <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                 <cat.icon className={`w-20 h-20 md:w-24 md:h-24 ${cat.text} group-hover:rotate-12 transition-transform duration-500`} />
-                <h3 className={`text-3xl font-black ${cat.text}`}>{cat.title}</h3>
-                <div className={`${cat.id === 'sandwiches' ? 'bg-black text-[#FAB520]' : 'bg-[#FAB520] text-black'} px-8 py-3 rounded-xl font-black text-lg`}>دخول المتجر</div>
+                <h3 className={`text-4xl font-normal font-['Lalezar'] ${cat.text}`}>{cat.title}</h3>
+                <div className={`${cat.id === 'sandwiches' ? 'bg-black text-[#FAB520]' : 'bg-[#FAB520] text-black'} px-8 py-3 rounded-xl font-bold text-lg`}>دخول المتجر</div>
               </motion.div>
             ))}
           </div>
         </section>
       </main>
 
-      {/* Optimized Fixed Cart Button for Mobile */}
-      <motion.button 
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        onClick={() => setIsGlobalSummaryOpen(true)} 
-        className="fixed bottom-6 left-6 md:bottom-10 md:left-10 z-[100] bg-[#FAB520] text-black p-4 md:p-6 rounded-full shadow-[0_15px_40px_rgba(250,181,32,0.6)] flex items-center gap-3 border-4 border-black"
-      >
-        <div className="relative">
-          <ShoppingBasket className="w-6 h-6 md:w-10 md:h-10" />
-          <AnimatePresence>
-            {totalItemCount > 0 && (
-              <motion.span 
-                initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}
-                className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] md:text-sm font-black w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center border-2 border-white"
-              >
-                {totalItemCount}
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </div>
-        <span className="text-xl font-black hidden sm:inline">السلة يا عم</span>
-      </motion.button>
+      {/* Floating Buttons Container */}
+      <div className="fixed bottom-6 left-6 md:bottom-10 md:left-10 flex flex-col items-start gap-4 z-[100]">
+         <motion.button 
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setIsGlobalSummaryOpen(true)} 
+          className="bg-[#FAB520] text-black p-4 md:p-6 rounded-full shadow-[0_15px_40px_rgba(250,181,32,0.6)] flex items-center gap-3 border-4 border-black"
+        >
+          <div className="relative">
+            <ShoppingBasket className="w-6 h-6 md:w-10 md:h-10" />
+            <AnimatePresence>
+              {totalItemCount > 0 && (
+                <motion.span 
+                  initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}
+                  className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] md:text-sm font-bold w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center border-2 border-white"
+                >
+                  {totalItemCount}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </div>
+          <span className="text-xl font-bold hidden sm:inline">السلة يا عم</span>
+        </motion.button>
+      </div>
+
+      {/* WhatsApp Floating Button - Placed at the right to avoid clash */}
+      <a href="https://wa.me/201010373331" target="_blank" rel="noreferrer" className="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-[100] bg-[#25D366] text-white p-4 md:p-6 rounded-full shadow-2xl flex items-center justify-center border-4 border-black transition-transform hover:scale-110 active:scale-90 whatsapp-btn">
+          <Phone className="w-6 h-6 md:w-10 md:h-10" />
+      </a>
 
       {/* Responsive Global Cart Drawer */}
       <AnimatePresence>
@@ -191,7 +222,7 @@ const App: React.FC = () => {
               <div className="p-5 md:p-8 flex justify-between items-center border-b border-white/5 bg-black/40 shrink-0">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-[#FAB520]/20 rounded-xl"><ShoppingBasket className="text-[#FAB520] w-6 h-6" /></div>
-                  <h2 className="text-2xl font-black">طلباتك يا عم</h2>
+                  <h2 className="text-3xl font-normal font-['Lalezar']">طلباتك يا عم</h2>
                 </div>
                 <button onClick={() => setIsGlobalSummaryOpen(false)} className="p-2 bg-white/5 rounded-full hover:bg-red-500/20"><X className="w-6 h-6" /></button>
               </div>
@@ -201,7 +232,7 @@ const App: React.FC = () => {
                 {fullOrderSummary.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full opacity-20 space-y-4">
                     <ShoppingBasket className="w-24 h-24" />
-                    <p className="text-xl font-black text-center">السلة لسه مفيهاش حاجة يا عم! املأها بسرعة</p>
+                    <p className="text-xl font-bold text-center">السلة لسه مفيهاش حاجة يا عم! املأها بسرعة</p>
                   </div>
                 ) : (
                   <div className="space-y-5 pb-4">
@@ -213,16 +244,16 @@ const App: React.FC = () => {
                       >
                         <div className="flex justify-between items-start mb-3">
                           <div>
-                            <h4 className="font-black text-xl leading-tight mb-1">{item.name}</h4>
-                            {item.bread && <span className="text-[10px] font-bold text-gray-500 bg-white/5 px-2 py-0.5 rounded-full">عيش {item.bread === 'baladi' ? 'بلدي' : 'فينو فرنساوي'}</span>}
+                            <h4 className="font-bold text-xl leading-tight mb-1">{item.name}</h4>
+                            {item.bread && <span className="text-[10px] font-bold text-gray-500 bg-white/5 px-2 py-0.5 rounded-full">خبز {item.bread === 'baladi' ? 'بلدي' : 'فينو'}</span>}
                           </div>
                           <button onClick={() => removeGlobalItem(item.name, item.category)} className="text-gray-600 hover:text-red-500 transition-colors"><Trash2 className="w-5 h-5" /></button>
                         </div>
                         <div className="flex justify-between items-center bg-black/40 p-3 rounded-xl border border-white/5">
-                          <span className="text-xl font-black text-[#FAB520]">{item.quantity * item.price} ج.م</span>
+                          <span className="text-2xl font-bold text-[#FAB520]">{item.quantity * item.price} ج.م</span>
                           <div className="flex items-center gap-4">
                             <button onClick={() => updateGlobalQuantity(item.name, item.category, -1)} className="text-[#FAB520] bg-white/5 p-1.5 rounded-lg active:scale-125 transition-transform"><Minus className="w-4 h-4" /></button>
-                            <span className="font-black text-xl w-6 text-center">{item.quantity}</span>
+                            <span className="font-bold text-xl w-6 text-center">{item.quantity}</span>
                             <button onClick={() => updateGlobalQuantity(item.name, item.category, 1)} className="text-[#FAB520] bg-white/5 p-1.5 rounded-lg active:scale-125 transition-transform"><Plus className="w-4 h-4" /></button>
                           </div>
                         </div>
@@ -230,7 +261,7 @@ const App: React.FC = () => {
                     ))}
                     
                     {/* Explicit Delivery Fee Row */}
-                    <div className="p-5 bg-[#FAB520]/5 rounded-2xl border border-dashed border-[#FAB520]/30 flex justify-between items-center text-[#FAB520] font-black text-sm">
+                    <div className="p-5 bg-[#FAB520]/5 rounded-2xl border border-dashed border-[#FAB520]/30 flex justify-between items-center text-[#FAB520] font-bold text-sm">
                       <div className="flex items-center gap-2">
                         <Truck className="w-5 h-5" />
                         <span>ملحوظة: مصاريف التوصيل</span>
@@ -252,27 +283,27 @@ const App: React.FC = () => {
                         <span>شامل التوصيل</span>
                       </div>
                     </div>
-                    <span className="text-4xl font-black text-[#FAB520]">{globalTotal} ج.م</span>
+                    <span className="text-4xl font-bold text-[#FAB520]">{globalTotal} ج.م</span>
                   </div>
 
                   <form onSubmit={handleFinalSubmit} className="space-y-3">
                     <div className="relative group">
                       <User className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-[#FAB520] transition-colors" />
-                      <input required placeholder="اسمك" className="w-full bg-white/5 border border-white/10 p-4 pr-11 rounded-2xl outline-none focus:border-[#FAB520] font-black text-base" value={userInfo.name} onChange={e => setUserInfo({...userInfo, name: e.target.value})} />
+                      <input required placeholder="اسمك" className="w-full bg-white/5 border border-white/10 p-4 pr-11 rounded-2xl outline-none focus:border-[#FAB520] font-bold text-base" value={userInfo.name} onChange={e => setUserInfo({...userInfo, name: e.target.value})} />
                     </div>
                     <div className="relative group">
                       <Phone className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-[#FAB520] transition-colors" />
-                      <input required type="tel" placeholder="تليفونك" className="w-full bg-white/5 border border-white/10 p-4 pr-11 rounded-2xl outline-none focus:border-[#FAB520] font-black text-base" value={userInfo.phone} onChange={e => setUserInfo({...userInfo, phone: e.target.value})} />
+                      <input required type="tel" placeholder="تليفونك" className="w-full bg-white/5 border border-white/10 p-4 pr-11 rounded-2xl outline-none focus:border-[#FAB520] font-bold text-base" value={userInfo.phone} onChange={e => setUserInfo({...userInfo, phone: e.target.value})} />
                     </div>
                     <div className="relative group">
                       <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-[#FAB520] transition-colors" />
-                      <input required placeholder="العنوان فين بالضبط؟" className="w-full bg-white/5 border border-white/10 p-4 pr-11 rounded-2xl outline-none focus:border-[#FAB520] font-black text-base" value={userInfo.address} onChange={e => setUserInfo({...userInfo, address: e.target.value})} />
+                      <input required placeholder="العنوان فين بالضبط؟" className="w-full bg-white/5 border border-white/10 p-4 pr-11 rounded-2xl outline-none focus:border-[#FAB520] font-bold text-base" value={userInfo.address} onChange={e => setUserInfo({...userInfo, address: e.target.value})} />
                     </div>
                     
                     <motion.button 
                       whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
                       disabled={isSubmitting}
-                      className="w-full py-5 bg-[#FAB520] text-black font-black text-2xl rounded-3xl shadow-[0_15px_30px_rgba(250,181,32,0.4)] flex items-center justify-center gap-3 disabled:opacity-50 mt-3"
+                      className="w-full py-5 bg-[#FAB520] text-black font-bold text-2xl rounded-3xl shadow-[0_15px_30px_rgba(250,181,32,0.4)] flex items-center justify-center gap-3 disabled:opacity-50 mt-3"
                     >
                       {isSubmitting ? <Loader2 className="animate-spin w-8 h-8" /> : <Send className="w-8 h-8" />}
                       {isSubmitting ? 'جاري الطيران...' : 'اطلب الآن يا عم!'}
@@ -290,7 +321,7 @@ const App: React.FC = () => {
         isOpen={activeModal === 'sandwiches'} onClose={() => setActiveModal(null)} title="ركن السندوتشات" 
         image="https://sayedsamkary.com/unnamed.jpg"
         type="sandwiches" globalTotal={globalTotal} subtotal={subtotal} deliveryFee={DELIVERY_FEE} persistentState={sandwichState} 
-        onUpdateState={(ns) => setSandwichState(ns)} onFinalSubmit={() => { setActiveModal(null); setIsGlobalSummaryOpen(true); }}
+        onUpdateState={(ns) => setSandwichState(ns)} onFinalSubmit={handleFinalSubmit}
         initialItems={SANDWICH_ITEMS} fullOrderSummary={fullOrderSummary} 
         updateGlobalQuantity={updateGlobalQuantity} removeGlobalItem={removeGlobalItem}
       />
@@ -298,7 +329,7 @@ const App: React.FC = () => {
         isOpen={activeModal === 'trays'} onClose={() => setActiveModal(null)} title="صواني وطواجن" 
         image="https://sayedsamkary.com/%D8%B5%D9%8A%D9%86%D9%8A%D8%A9%20%D9%83%D9%88%D8%B3%D8%A9%20%D8%A8%D8%A7%D9%84%D8%A8%D8%B4%D8%A7%D9%85%D9%84.jpg"
         type="trays" globalTotal={globalTotal} subtotal={subtotal} deliveryFee={DELIVERY_FEE} persistentState={trayState} 
-        onUpdateState={(ns) => setTrayState(ns)} onFinalSubmit={() => { setActiveModal(null); setIsGlobalSummaryOpen(true); }}
+        onUpdateState={(ns) => setTrayState(ns)} onFinalSubmit={handleFinalSubmit}
         initialItems={TRAY_ITEMS} fullOrderSummary={fullOrderSummary}
         updateGlobalQuantity={updateGlobalQuantity} removeGlobalItem={removeGlobalItem}
       />
@@ -306,7 +337,7 @@ const App: React.FC = () => {
         isOpen={activeModal === 'sweets'} onClose={() => setActiveModal(null)} title="حلويات يا عم" 
         image="https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=800&q=80"
         type="sweets" globalTotal={globalTotal} subtotal={subtotal} deliveryFee={DELIVERY_FEE} persistentState={sweetState} 
-        onUpdateState={(ns) => setSweetState(ns)} onFinalSubmit={() => { setActiveModal(null); setIsGlobalSummaryOpen(true); }}
+        onUpdateState={(ns) => setSweetState(ns)} onFinalSubmit={handleFinalSubmit}
         initialItems={SWEET_ITEMS} fullOrderSummary={fullOrderSummary}
         updateGlobalQuantity={updateGlobalQuantity} removeGlobalItem={removeGlobalItem}
       />
@@ -317,7 +348,7 @@ const App: React.FC = () => {
             <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="bg-[#FAB520] p-12 rounded-full mb-8 shadow-[0_0_100px_rgba(250,181,32,0.6)]">
               <Send className="w-24 h-24 text-black" />
             </motion.div>
-            <h2 className="text-5xl font-black text-[#FAB520] mb-4">طلبك طار عندنا!</h2>
+            <h2 className="text-6xl font-normal font-['Lalezar'] text-[#FAB520] mb-4">طلبك طار عندنا!</h2>
             <p className="text-2xl text-gray-400 font-bold">هيكون عندك خلال 25 دقيقة بالضبط 🛵💨</p>
           </motion.div>
         )}
@@ -325,7 +356,7 @@ const App: React.FC = () => {
 
       <footer className="py-16 text-center text-gray-700 bg-black/50 border-t border-white/5">
         <img src={LOGO_URL} className="h-16 mx-auto mb-6 grayscale opacity-20" alt="Footer Logo" />
-        <p className="font-black text-xs tracking-widest">جميع الحقوق محفوظة لـ يا عم . كوم © 2025</p>
+        <p className="font-bold text-xs tracking-widest uppercase">جميع الحقوق محفوظة لـ يا عم . كوم © 2025</p>
       </footer>
     </div>
   );

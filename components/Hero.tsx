@@ -33,7 +33,7 @@ const Hero: React.FC = () => {
         transition={{ delay: 0.3, type: 'spring' }}
         className="relative z-10"
       >
-        <h1 className="text-5xl md:text-7xl font-black mb-6 leading-[1.1] tracking-tight">
+        <h1 className="text-6xl md:text-8xl font-normal mb-6 leading-[1.1] tracking-tight font-['Lalezar']">
           أسرع دليفري في <br/> 
           <span className="text-[#FAB520] drop-shadow-[0_5px_15px_rgba(250,181,32,0.3)]">مصر يا عم!</span>
         </h1>
@@ -45,7 +45,7 @@ const Hero: React.FC = () => {
             transition={{ delay: 0.6 }}
             className="bg-white/5 backdrop-blur-md border border-white/10 px-6 py-3 rounded-2xl inline-block shadow-2xl"
           >
-            <p className="text-lg md:text-xl text-gray-300 font-black">
+            <p className="text-xl md:text-2xl text-gray-300 font-bold">
               كبدة • سجق • حواوشي • طواجن • حلويات
             </p>
           </motion.div>

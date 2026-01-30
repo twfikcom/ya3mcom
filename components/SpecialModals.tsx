@@ -68,7 +68,7 @@ const SpecialModal: React.FC<ModalProps> = ({
           animate={{ y: 0 }} 
           exit={{ y: '100%' }} 
           transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-          className="relative w-full md:max-w-4xl h-[95dvh] md:h-auto md:max-h-[85vh] bg-[#0c0c0c] md:rounded-[3.5rem] border-t-4 md:border-2 border-[#FAB520] flex flex-col overflow-hidden shadow-[0_0_100px_rgba(250,181,32,0.3)]"
+          className="relative w-full md:max-w-4xl h-[95dvh] md:h-auto md:max-h-[85vh] bg-[#0c0c0c] md:rounded-[3.5rem] border-t-4 md:border-2 border-[#FAB520] flex flex-col overflow-hidden shadow-[0_0_100px_rgba(250,181,32,0.3)] font-['Changa']"
         >
           {/* Header Area */}
           <div className="relative h-40 md:h-64 shrink-0">
@@ -76,7 +76,7 @@ const SpecialModal: React.FC<ModalProps> = ({
             <div className="absolute inset-0 bg-gradient-to-t from-[#0c0c0c] via-transparent" />
             <button onClick={onClose} className="absolute top-6 left-6 p-3 bg-black/50 rounded-full text-white backdrop-blur-md z-20"><X className="w-6 h-6" /></button>
             <div className="absolute bottom-6 right-8 z-10">
-              <h2 className="text-2xl md:text-5xl font-black text-white drop-shadow-lg">{title}</h2>
+              <h2 className="text-3xl md:text-6xl font-normal text-white drop-shadow-lg font-['Lalezar']">{title}</h2>
             </div>
           </div>
 
@@ -91,8 +91,8 @@ const SpecialModal: React.FC<ModalProps> = ({
                 <div className="flex items-center gap-3">
                   <Sparkles className={`w-5 h-5 ${persistentState.hasSecretSauce ? 'text-black' : 'text-[#FAB520]'}`} />
                   <div>
-                    <h4 className="font-black text-lg">صوص أعجوبة السحري ✨</h4>
-                    <p className="text-[10px] opacity-60">خلطة يا عم السرية للطلب كله (+10 ج.م)</p>
+                    <h4 className="font-bold text-lg">صوص أعجوبة السحري ✨</h4>
+                    <p class="text-[10px] opacity-60">خلطة يا عم السرية للطلب كله (+10 ج.م)</p>
                   </div>
                 </div>
                 <div className={`w-10 h-5 rounded-full relative ${persistentState.hasSecretSauce ? 'bg-black' : 'bg-white/10'}`}>
@@ -115,19 +115,19 @@ const SpecialModal: React.FC<ModalProps> = ({
                   >
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex-1">
-                        <h3 className="text-xl md:text-2xl font-black mb-1">{item.name}</h3>
-                        <p className="text-[#FAB520] font-black text-lg">{item.price} ج.م</p>
+                        <h3 className="text-xl md:text-2xl font-bold mb-1">{item.name}</h3>
+                        <p className="text-[#FAB520] font-bold text-lg">{item.price} ج.م</p>
                       </div>
                       <div className="flex items-center gap-4 bg-black p-2 rounded-xl border border-white/10">
                         <button onClick={() => handleUpdateQty(item.name, -1)} className="text-[#FAB520] p-1.5 active:scale-125 transition-transform"><Minus className="w-5 h-5" /></button>
-                        <span className="text-2xl font-black w-6 text-center">{qty}</span>
+                        <span className="text-2xl font-bold w-6 text-center">{qty}</span>
                         <button onClick={() => handleUpdateQty(item.name, 1)} className="text-[#FAB520] p-1.5 active:scale-125 transition-transform"><Plus className="w-5 h-5" /></button>
                       </div>
                     </div>
                     {type === 'sandwiches' && qty > 0 && item.name !== 'حواوشي يا عم' && (
                       <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-4 pt-4 border-t border-white/5 grid grid-cols-2 gap-3">
-                        <button onClick={() => handleBreadChoice(item.name, 'baladi')} className={`py-3 rounded-xl font-black text-base transition-all ${bread === 'baladi' ? 'bg-[#FAB520] text-black shadow-lg scale-[1.02]' : 'bg-white/5 text-gray-500'}`}>عيش بلدي 🥖</button>
-                        <button onClick={() => handleBreadChoice(item.name, 'western')} className={`py-3 rounded-xl font-black text-base transition-all ${bread === 'western' ? 'bg-[#FAB520] text-black shadow-lg scale-[1.02]' : 'bg-white/5 text-gray-500'}`}>عيش فينو فرنساوي 🥯</button>
+                        <button onClick={() => handleBreadChoice(item.name, 'baladi')} className={`py-3 rounded-xl font-bold text-base transition-all ${bread === 'baladi' ? 'bg-[#FAB520] text-black shadow-lg scale-[1.02]' : 'bg-white/5 text-gray-500'}`}>عيش بلدي</button>
+                        <button onClick={() => handleBreadChoice(item.name, 'western')} className={`py-3 rounded-xl font-bold text-base transition-all ${bread === 'western' ? 'bg-[#FAB520] text-black shadow-lg scale-[1.02]' : 'bg-white/5 text-gray-500'}`}>عيش فينو</button>
                       </motion.div>
                     )}
                   </motion.div>
@@ -142,7 +142,7 @@ const SpecialModal: React.FC<ModalProps> = ({
               <div className="flex flex-col items-center md:items-start">
                 <span className="text-gray-500 font-bold text-base">إجمالي القسم:</span>
                 <div className="flex flex-col">
-                  <span className="text-4xl font-black text-[#FAB520] tracking-tight">{globalTotal} ج.م</span>
+                  <span className="text-4xl font-bold text-[#FAB520] tracking-tight">{globalTotal} ج.م</span>
                   <div className="flex items-center gap-1 text-[10px] text-gray-400 mt-1">
                     <Truck className="w-2.5 h-2.5" />
                     <span>يضاف {deliveryFee} ج.م مصاريف توصيل عند الطلب</span>
@@ -150,10 +150,10 @@ const SpecialModal: React.FC<ModalProps> = ({
                 </div>
               </div>
               <div className="flex gap-4 w-full md:w-auto">
-                  <button onClick={onClose} className="flex-1 md:px-10 py-4 bg-white/5 border border-white/10 rounded-2xl font-black text-lg hover:bg-white/10 transition-colors">تكملة الطلب</button>
+                  <button onClick={onClose} className="flex-1 md:px-10 py-4 bg-white/5 border border-white/10 rounded-2xl font-bold text-lg hover:bg-white/10 transition-colors">تكملة الطلب</button>
                   <button 
                     onClick={() => onFinalSubmit({})} 
-                    className="flex-1 md:px-10 py-4 bg-[#FAB520] text-black rounded-2xl font-black text-xl shadow-[0_15px_30px_rgba(250,181,32,0.4)] hover:scale-[1.02] active:scale-95 transition-all"
+                    className="flex-1 md:px-10 py-4 bg-[#FAB520] text-black rounded-2xl font-bold text-2xl font-['Lalezar'] shadow-[0_15px_30px_rgba(250,181,32,0.4)] hover:scale-[1.02] active:scale-95 transition-all"
                   >
                     تثبيت الأكلة
                   </button>

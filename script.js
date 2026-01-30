@@ -1,4 +1,43 @@
 
+// Preloader Logic
+window.addEventListener('load', () => {
+    const preloader = document.getElementById('preloader');
+    const loaderBar = document.getElementById('loader-bar');
+    const loaderText = document.getElementById('loader-text');
+    
+    const messages = [
+        "أسم على كل لسان!",
+        "بنقطع العيش البلدي...",
+        "صوص أعجوبة بيجهز...",
+        "يا عم الطلب قرب يفتح!"
+    ];
+    
+    let progress = 0;
+    let msgIndex = 0;
+    
+    const interval = setInterval(() => {
+        progress += Math.random() * 20;
+        if (progress > 100) progress = 100;
+        
+        loaderBar.style.width = `${progress}%`;
+        
+        if (progress > (msgIndex + 1) * 25 && msgIndex < messages.length - 1) {
+            msgIndex++;
+            loaderText.innerText = messages[msgIndex];
+        }
+        
+        if (progress === 100) {
+            clearInterval(interval);
+            setTimeout(() => {
+                preloader.style.opacity = '0';
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                }, 700);
+            }, 500);
+        }
+    }, 150);
+});
+
 // Data
 const MENU = {
     sandwiches: {

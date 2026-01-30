@@ -4,11 +4,33 @@
 ::-webkit-scrollbar-track { background: #000; }
 ::-webkit-scrollbar-thumb { background: #FAB520; border-radius: 10px; }
 
+:root {
+    --font-heading: 'Lalezar', system-ui, sans-serif;
+    --font-body: 'Changa', sans-serif;
+}
+
+body {
+    font-family: var(--font-body);
+}
+
+h1, h2, h3, .heading-font {
+    font-family: var(--font-heading);
+}
+
 .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
 .scrollbar-hide::-webkit-scrollbar { display: none; }
+
+/* Preloader Animations */
+@keyframes pulseSlow {
+    0%, 100% { transform: scale(1); opacity: 0.8; filter: drop-shadow(0 0 20px rgba(250,181,32,0.2)); }
+    50% { transform: scale(1.05); opacity: 1; filter: drop-shadow(0 0 40px rgba(250,181,32,0.4)); }
+}
+.animate-pulse-slow {
+    animation: pulseSlow 3s ease-in-out infinite;
+}
 
 /* Animations */
 @keyframes scooterMove {
