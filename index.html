@@ -111,7 +111,7 @@
         <p class="text-gray-500 font-bold">جميع الحقوق محفوظة لـ يا عم . كوم © 2025</p>
     </footer>
 
-    <!-- Floating Cart Button -->
+    <!-- Floating Cart Button (Bottom Left) -->
     <button onclick="openModal('cart-modal')" class="fixed bottom-8 left-8 z-[50] primary-bg text-black p-5 rounded-full shadow-2xl flex items-center gap-3 border-4 border-black transition-all hover:scale-110">
         <div class="relative">
             <i data-lucide="shopping-basket" class="w-8 h-8"></i>
@@ -119,6 +119,12 @@
         </div>
         <span class="font-black hidden sm:inline">السلة يا عم</span>
     </button>
+
+    <!-- Floating WhatsApp Button (Bottom Right) -->
+    <a href="https://wa.me/201010373331" target="_blank" class="fixed bottom-8 right-8 z-[50] bg-[#25D366] text-white p-5 rounded-full shadow-2xl flex items-center gap-3 border-4 border-white transition-all hover:scale-110 animate__animated animate__bounceIn">
+        <i data-lucide="message-circle" class="w-8 h-8"></i>
+        <span class="font-black hidden sm:inline">اطلب واتساب</span>
+    </a>
 
     <!-- Modals (Simplified Structure) -->
     <!-- Sandwiches Modal -->
@@ -138,9 +144,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Similar Modals for Trays and Sweets would go here -->
-    <!-- ... (Sweets and Trays modals structure is similar) -->
 
     <!-- Global Cart Modal -->
     <div id="cart-modal" class="modal items-center justify-center p-4">
