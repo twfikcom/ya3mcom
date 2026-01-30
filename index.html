@@ -26,35 +26,7 @@
 </script>
 </head>
 <body class="bg-black text-white selection:bg-[#FAB520] selection:text-black overflow-x-hidden">
-
-    <!-- Preloader Screen -->
-    <div id="preloader" class="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center transition-opacity duration-700">
-        <div class="relative">
-            <img src="http://sayedsamkary.com/%D9%8A%D8%A7%D8%B9%D9%85.png" alt="Loading Logo" class="h-32 md:h-48 object-contain animate-pulse-slow">
-            <div class="absolute -bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center w-full">
-                <div class="w-48 h-1 bg-white/10 rounded-full overflow-hidden mb-3">
-                    <div id="loader-bar" class="h-full bg-[#FAB520] w-0 transition-all duration-500 ease-out"></div>
-                </div>
-                <p id="loader-text" class="text-[#FAB520] font-black text-lg animate-bounce">أسم على كل لسان!</p>
-            </div>
-        </div>
-        <div class="absolute bottom-10 text-white/20 font-bold text-sm tracking-widest uppercase">Ya3m.com Delivery</div>
-    </div>
-
-    <!-- Background Entertainment -->
-    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div class="glow-bg absolute -top-1/4 -right-1/4 w-[150%] h-[150%] border-[2px] border-[#FAB520]/5 rounded-full blur-2xl"></div>
-        <div class="scooter absolute top-[20%] text-5xl opacity-30 select-none">🛵💨</div>
-        <div class="floating-item absolute text-4xl opacity-10 select-none" style="top: 20%; right: 10%;">🥪</div>
-        <div class="floating-item absolute text-4xl opacity-10 select-none" style="bottom: 40%; left: 15%;">🥘</div>
-    </div>
-
+    <!-- تم نقل شاشة التحميل والخلفية داخل React لضمان التزامن ومنع الاختفاء -->
     <div id="root"></div>
-
-    <script src="script.js"></script>
-    <script>
-        // Initialize Lucide Icons
-        lucide.createIcons();
-    </script>
 </body>
 </html>
