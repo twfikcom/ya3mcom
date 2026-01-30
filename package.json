@@ -9,10 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@google/genai": "^1.38.0",
     "react": "^19.2.4",
-    "framer-motion": "^12.29.2",
-    "lucide-react": "^0.563.0"
+    "react-dom": "^19.2.4",
+    "framer-motion": "10.16.4",
+    "lucide-react": "0.284.0",
+    "@google/genai": "^1.38.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
