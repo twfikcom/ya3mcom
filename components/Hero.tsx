@@ -2,45 +2,98 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { LOGO_URL } from '../constants';
+import { Truck } from 'lucide-react';
 
 const Hero: React.FC = () => {
   return (
-    <div className="relative flex flex-col items-center justify-center text-center py-10 overflow-hidden">
+    <div className="relative flex flex-col items-center justify-center text-center py-10 md:py-16 overflow-hidden">
+      {/* Dynamic Background Glow */}
+      <motion.div 
+        animate={{ 
+          scale: [1, 1.2, 1],
+          opacity: [0.3, 0.5, 0.3],
+        }}
+        transition={{ duration: 4, repeat: Infinity }}
+        className="absolute inset-0 bg-[#FAB520]/10 blur-[120px] rounded-full z-0"
+      />
+
       <motion.img 
-        initial={{ y: -50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ type: 'spring' }}
+        initial={{ y: -100, opacity: 0, rotate: -20 }}
+        animate={{ y: 0, opacity: 1, rotate: 0 }}
+        transition={{ type: 'spring', bounce: 0.5, duration: 1 }}
+        whileHover={{ scale: 1.1, rotate: 5 }}
         src={LOGO_URL} 
         alt="Ya3m Logo" 
-        className="h-40 md:h-56 object-contain mb-8 drop-shadow-[0_0_30px_rgba(250,181,32,0.5)]"
+        className="h-36 md:h-52 object-contain mb-8 drop-shadow-[0_0_40px_rgba(250,181,32,0.4)] relative z-10 cursor-pointer"
       />
       
-      <motion.h1 
+      <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        className="text-5xl md:text-7xl font-black mb-6 leading-tight"
+        transition={{ delay: 0.3, type: 'spring' }}
+        className="relative z-10"
       >
-        أسرع دليفري في <br/> <span className="text-[#FAB520]">مصر يا عم!</span>
-      </motion.h1>
+        <h1 className="text-5xl md:text-7xl font-black mb-6 leading-[1.1] tracking-tight">
+          أسرع دليفري في <br/> 
+          <span className="text-[#FAB520] drop-shadow-[0_5px_15px_rgba(250,181,32,0.3)]">مصر يا عم!</span>
+        </h1>
+        
+        <div className="flex flex-col items-center gap-4">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="bg-white/5 backdrop-blur-md border border-white/10 px-6 py-3 rounded-2xl inline-block shadow-2xl"
+          >
+            <p className="text-lg md:text-xl text-gray-300 font-black">
+              كبدة • سجق • حواوشي • طواجن • حلويات
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="flex items-center gap-2 text-[#FAB520] bg-[#FAB520]/10 px-4 py-2 rounded-full border border-[#FAB520]/20 font-bold text-sm"
+          >
+            <Truck className="w-4 h-4" />
+            <span>خدمة التوصيل بـ 20 جنيه بس!</span>
+          </motion.div>
+        </div>
+      </motion.div>
       
-      <motion.p 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4 }}
-        className="text-lg md:text-xl text-gray-400 font-bold max-w-2xl px-4"
-      >
-        كبدة، سجق، حواوشي، طواجن وحلويات.. <br/> 
-        اختار اللي يريحك وإحنا نجيلك طايرين!
-      </motion.p>
-      
-      {/* Small floating scooter */}
+      {/* Entertaining floating elements */}
       <motion.div
-        animate={{ x: [-100, 1000] }}
-        transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-        className="absolute bottom-0 left-0 text-5xl opacity-20 pointer-events-none"
+        animate={{ 
+          x: [-200, 1200],
+          y: [0, -10, 0]
+        }}
+        transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+        className="absolute bottom-10 left-0 text-5xl opacity-40 pointer-events-none select-none z-0"
       >
         🛵💨
+      </motion.div>
+
+      <motion.div
+        animate={{ 
+          y: [0, -20, 0],
+          rotate: [0, 10, -10, 0]
+        }}
+        transition={{ duration: 5, repeat: Infinity }}
+        className="absolute top-20 right-[10%] text-4xl opacity-20 pointer-events-none z-0"
+      >
+        🥪
+      </motion.div>
+
+      <motion.div
+        animate={{ 
+          y: [0, 20, 0],
+          rotate: [0, -15, 15, 0]
+        }}
+        transition={{ duration: 6, repeat: Infinity }}
+        className="absolute bottom-40 left-[15%] text-4xl opacity-20 pointer-events-none z-0"
+      >
+        🥘
       </motion.div>
     </div>
   );
