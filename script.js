@@ -114,8 +114,8 @@ function renderModalItems(catId) {
             </div>
             ${item.bread && qty > 0 ? `
                 <div class="mt-4 pt-4 border-t border-white/5 grid grid-cols-2 gap-3">
-                    <button onclick="setBread('${item.id}', 'baladi')" class="bread-btn py-3 rounded-xl font-black text-base transition-all ${bread === 'baladi' ? 'active' : 'bg-white/5 text-gray-500'}">عيش بلدي 🥖</button>
-                    <button onclick="setBread('${item.id}', 'western')" class="bread-btn py-3 rounded-xl font-black text-base transition-all ${bread === 'western' ? 'active' : 'bg-white/5 text-gray-500'}">عيش فينو فرنساوي 🥯</button>
+                    <button onclick="setBread('${item.id}', 'baladi')" class="bread-btn py-3 rounded-xl font-black text-base transition-all ${bread === 'baladi' ? 'active' : 'bg-white/5 text-gray-500'}">عيش بلدي</button>
+                    <button onclick="setBread('${item.id}', 'western')" class="bread-btn py-3 rounded-xl font-black text-base transition-all ${bread === 'western' ? 'active' : 'bg-white/5 text-gray-500'}">عيش فينو فرنساوي</button>
                 </div>
             ` : ''}
         `;
@@ -268,6 +268,7 @@ function updateCartTotals() {
     
     const final = subtotal > 0 ? subtotal + STATE.deliveryFee : 0;
     document.getElementById('cart-final-total').innerText = final + " ج.م";
+    return final;
 }
 
 function updateCartUI() {
@@ -281,22 +282,66 @@ function updateCartUI() {
     }
 }
 
-function handleOrder(e) {
+async function handleOrder(e) {
     e.preventDefault();
+    const btn = document.getElementById('submit-btn');
+    const btnText = document.getElementById('btn-text');
+    const btnIcon = document.getElementById('btn-icon');
+    
     const name = document.getElementById('user-name').value;
     const phone = document.getElementById('user-phone').value;
     const address = document.getElementById('user-address').value;
     
-    if (!name || !phone || !address) return;
+    if (!name || !phone || !address || STATE.cart.length === 0) return;
+
+    // Formatting order details for email
+    let orderDetails = "تفاصيل الطلب:\n";
+    STATE.cart.forEach(item => {
+        orderDetails += `- ${item.name} (${item.quantity}) | السعر: ${item.price * item.quantity} ج.م`;
+        if (item.bread) orderDetails += ` | العيش: ${item.bread === 'baladi' ? 'بلدي' : 'فينو فرنساوي'}`;
+        orderDetails += "\n";
+    });
+    if (STATE.hasSecretSauce) orderDetails += "+ صوص أعجوبة السحري (10 ج.م)\n";
     
-    toggleCart(false);
-    const success = document.getElementById('success-screen');
-    success.classList.remove('hidden');
+    const finalTotal = updateCartTotals();
+    orderDetails += `\nالإجمالي النهائي (شامل التوصيل): ${finalTotal} ج.م`;
+
+    // Start Submission
+    btn.disabled = true;
+    btnText.innerText = "جاري إرسال الطلب...";
     
-    setTimeout(() => {
-        success.classList.add('hidden');
-        STATE.cart = [];
-        updateCartUI();
-        document.getElementById('order-form').reset();
-    }, 4000);
+    try {
+        const response = await fetch("https://formspree.io/f/xdazllep", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Accept": "application/json" },
+            body: JSON.stringify({
+                الاسم: name,
+                التليفون: phone,
+                العنوان: address,
+                تفاصيل_الطلب: orderDetails,
+                الحساب_النهائي: finalTotal + " ج.م"
+            })
+        });
+
+        if (response.ok) {
+            toggleCart(false);
+            const success = document.getElementById('success-screen');
+            success.classList.remove('hidden');
+            
+            setTimeout(() => {
+                success.classList.add('hidden');
+                STATE.cart = [];
+                STATE.hasSecretSauce = false;
+                updateCartUI();
+                document.getElementById('order-form').reset();
+            }, 4000);
+        } else {
+            alert("يا عم حصل مشكلة في الإرسال، جرب تاني!");
+        }
+    } catch (error) {
+        alert("يا عم النت فيه مشكلة، جرب تاني!");
+    } finally {
+        btn.disabled = false;
+        btnText.innerText = "اطلب الآن يا عم!";
+    }
 }

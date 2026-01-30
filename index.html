@@ -18,9 +18,9 @@
     "react": "https://esm.sh/react@^19.2.4",
     "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
     "react/": "https://esm.sh/react@^19.2.4/",
-    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
     "@google/genai": "https://esm.sh/@google/genai@^1.38.0",
-    "framer-motion": "https://esm.sh/framer-motion@^12.29.2"
+    "framer-motion": "https://esm.sh/framer-motion@^12.29.2",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0"
   }
 }
 </script>
@@ -79,13 +79,18 @@
     </main>
 
     <!-- Floating Cart Button -->
-    <button onclick="toggleCart(true)" class="fixed bottom-6 left-6 md:bottom-10 md:left-10 z-[100] bg-[#FAB520] text-black p-4 md:p-6 rounded-full shadow-2xl flex items-center gap-3 border-4 border-black transition-transform active:scale-90">
+    <button id="cart-btn" onclick="toggleCart(true)" class="fixed bottom-6 left-6 md:bottom-10 md:left-10 z-[100] bg-[#FAB520] text-black p-4 md:p-6 rounded-full shadow-2xl flex items-center gap-3 border-4 border-black transition-transform active:scale-90">
         <div class="relative">
             <i data-lucide="shopping-basket" class="w-6 h-6 md:w-10 md:h-10"></i>
             <span id="cart-badge" class="hidden absolute -top-2 -right-2 bg-red-600 text-white text-[10px] md:text-sm font-black w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center border-2 border-white">0</span>
         </div>
         <span class="text-xl font-black hidden sm:inline">السلة يا عم</span>
     </button>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/201010373331" target="_blank" class="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-[100] bg-[#25D366] text-white p-4 md:p-6 rounded-full shadow-2xl flex items-center justify-center border-4 border-black transition-transform hover:scale-110 active:scale-90 whatsapp-btn">
+        <i data-lucide="message-circle" class="w-6 h-6 md:w-10 md:h-10"></i>
+    </a>
 
     <!-- Category Modal -->
     <div id="modal-overlay" class="hidden fixed inset-0 z-[2000] flex items-end md:items-center justify-center overflow-hidden">
@@ -148,13 +153,15 @@
                     </div>
                     <span id="cart-final-total" class="text-4xl font-black text-[#FAB520]">0 ج.م</span>
                 </div>
+                <!-- Modified Form for Formspree -->
                 <form id="order-form" class="space-y-3" onsubmit="handleOrder(event)">
-                    <input required placeholder="اسمك" id="user-name" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-[#FAB520] font-black text-base">
-                    <input required type="tel" placeholder="تليفونك" id="user-phone" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-[#FAB520] font-black text-base">
-                    <input required placeholder="العنوان فين بالضبط؟" id="user-address" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-[#FAB520] font-black text-base">
-                    <button type="submit" class="w-full py-5 bg-[#FAB520] text-black font-black text-2xl rounded-3xl shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-transform">
-                        <i data-lucide="send" class="w-8 h-8"></i>
-                        <span>اطلب الآن يا عم!</span>
+                    <input required name="الاسم" placeholder="اسمك" id="user-name" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-[#FAB520] font-black text-base">
+                    <input required name="التليفون" type="tel" placeholder="تليفونك" id="user-phone" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-[#FAB520] font-black text-base">
+                    <input required name="العنوان" placeholder="العنوان فين بالضبط؟" id="user-address" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-[#FAB520] font-black text-base">
+                    
+                    <button type="submit" id="submit-btn" class="w-full py-5 bg-[#FAB520] text-black font-black text-2xl rounded-3xl shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-transform disabled:opacity-50">
+                        <i data-lucide="send" id="btn-icon" class="w-8 h-8"></i>
+                        <span id="btn-text">اطلب الآن يا عم!</span>
                     </button>
                 </form>
             </div>
