@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, ChevronRight, CheckCircle2, ListChecks, Plus, Minus, Trash2, Truck } from 'lucide-react';
+import { X, Send, ChevronRight, CheckCircle2, ListChecks, Plus, Minus, Trash2, Truck, Loader2 } from 'lucide-react';
 
 interface ModalProps {
   isOpen: boolean;
@@ -23,6 +23,7 @@ interface ModalProps {
   fullOrderSummary: { name: string; quantity: number; price: number; bread?: string; category: string }[];
   updateGlobalQuantity: (name: string, category: string, delta: number) => void;
   removeGlobalItem: (name: string, category: string) => void;
+  isSubmitting?: boolean;
 }
 
 const SpecialModal: React.FC<ModalProps> = ({ 
@@ -40,7 +41,8 @@ const SpecialModal: React.FC<ModalProps> = ({
   onFinalSubmit,
   fullOrderSummary,
   updateGlobalQuantity,
-  removeGlobalItem
+  removeGlobalItem,
+  isSubmitting = false
 }) => {
   const [userInfo, setUserInfo] = useState({ name: '', phone: '', address: '' });
   const [showSuccess, setShowSuccess] = useState(false);
@@ -78,11 +80,6 @@ const SpecialModal: React.FC<ModalProps> = ({
       return;
     }
     onFinalSubmit(userInfo);
-    setShowSuccess(true);
-    setTimeout(() => {
-      setShowSuccess(false);
-      onClose();
-    }, 4000);
   };
 
   if (!isOpen) return null;
@@ -139,16 +136,6 @@ const SpecialModal: React.FC<ModalProps> = ({
                   })}
                 </div>
 
-                {type === 'sandwiches' && (
-                  <div className="p-6 bg-[#FAB520]/10 border border-[#FAB520]/30 rounded-[2rem] flex items-center justify-between">
-                    <div><h4 className="text-xl font-black text-[#FAB520]">صوص أعجوبة السري ✨</h4><p className="text-xs text-gray-400 font-bold">خلطة يا عم السرية اللي هتدوخك من جمالها</p></div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" checked={persistentState.hasSecretSauce || false} onChange={handleSauceToggle} className="sr-only peer" />
-                      <div className="w-16 h-8 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-[#FAB520]"></div>
-                    </label>
-                  </div>
-                )}
-
                 <div className="space-y-6 pt-6 border-t border-white/10">
                   <h4 className="text-xl font-black text-[#FAB520] text-center">بياناتك يا عم عشان نجيلك</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -169,7 +156,10 @@ const SpecialModal: React.FC<ModalProps> = ({
                   </div>
                   <div className="flex flex-col sm:flex-row gap-6">
                     <button type="button" onClick={onClose} className="flex-1 bg-white/5 border border-white/10 text-white font-black py-6 rounded-[2rem] text-lg hover:bg-white/10 active:scale-95 transition-all">لسه هطلب أنواع تاني</button>
-                    <button onClick={handleSubmit} className="flex-1 bg-[#FAB520] text-black font-black py-6 rounded-[2rem] text-xl flex items-center justify-center gap-3 hover:shadow-[0_0_40px_rgba(250,181,32,0.6)] active:scale-95 transition-all shadow-xl"><Send className="w-8 h-8" />إتمام الطلب</button>
+                    <button onClick={handleSubmit} disabled={isSubmitting} className="flex-1 bg-[#FAB520] text-black font-black py-6 rounded-[2rem] text-xl flex items-center justify-center gap-3 hover:shadow-[0_0_40px_rgba(250,181,32,0.6)] active:scale-95 transition-all shadow-xl disabled:opacity-50">
+                      {isSubmitting ? <Loader2 className="w-8 h-8 animate-spin" /> : <Send className="w-8 h-8" />}
+                      {isSubmitting ? 'جاري الإرسال...' : 'إتمام الطلب'}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -207,26 +197,10 @@ const SpecialModal: React.FC<ModalProps> = ({
                           </div>
                         </div>
                       ))}
-                      <div className="flex justify-between items-center p-2.5 bg-white/5 rounded-lg border border-dashed border-white/20">
-                        <p className="font-black text-gray-400 text-xs flex items-center gap-1"><Truck className="w-3 h-3" /> التوصيل</p>
-                        <span className="font-black text-gray-400 text-xs">{deliveryFee} ج.م</span>
-                      </div>
                     </>
                   )}
-                  {persistentState.hasSecretSauce && (
-                    <div className="flex justify-between items-center p-2.5 bg-[#FAB520]/10 rounded-lg border border-[#FAB520]/20"><p className="font-black text-[#FAB520] text-xs">صوص أعجوبة السري</p><span className="font-black text-[#FAB520] text-xs">10 ج.م</span></div>
-                  )}
                 </div>
-                <div className="mt-6 pt-3 border-t border-white/10 space-y-1">
-                  <div className="flex justify-between items-center text-[10px] text-gray-500 font-bold">
-                    <span>الحساب: {subtotal} ج.م</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-black text-white">الإجمالي:</span>
-                    <span className="text-xl font-black text-[#FAB520]">{globalTotal} ج.م</span>
-                  </div>
-                </div>
-                <button onClick={() => setShowSummaryOverlay(false)} className="w-full mt-4 bg-[#FAB520] text-black font-black py-3 rounded-xl text-sm hover:scale-105 transition-transform">تمام يا عم</button>
+                <button onClick={() => setShowSummaryOverlay(false)} className="w-full mt-4 bg-[#FAB520] text-black font-black py-3 rounded-xl text-sm">تمام يا عم</button>
               </motion.div>
             </div>
           )}

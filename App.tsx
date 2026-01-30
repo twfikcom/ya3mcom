@@ -5,7 +5,7 @@ import Hero from './components/Hero';
 import SpecialModal from './components/SpecialModals';
 import { LOGO_URL, SANDWICH_ITEMS, TRAY_ITEMS, SWEET_ITEMS } from './constants';
 import { SpecialOrderState } from './types';
-import { Utensils, IceCream, Sandwich, ShoppingBasket, X, Trash2, Send, Plus, Minus, Truck } from 'lucide-react';
+import { Utensils, IceCream, Sandwich, ShoppingBasket, X, Trash2, Send, Plus, Minus, Truck, Loader2 } from 'lucide-react';
 
 const DELIVERY_FEE = 20;
 
@@ -14,6 +14,7 @@ const App: React.FC = () => {
   const [isGlobalSummaryOpen, setIsGlobalSummaryOpen] = useState(false);
   const [userInfo, setUserInfo] = useState({ name: '', phone: '', address: '' });
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [sandwichState, setSandwichState] = useState<SpecialOrderState>({
     quantities: Object.fromEntries(SANDWICH_ITEMS.map(i => [i.name, 0])),
@@ -29,44 +30,29 @@ const App: React.FC = () => {
     quantities: Object.fromEntries(SWEET_ITEMS.map(i => [i.name, 0]))
   });
 
-  // Ensure state matches constants if they change
   useEffect(() => {
     setTrayState(prev => ({
       ...prev,
-      quantities: {
-        ...Object.fromEntries(TRAY_ITEMS.map(i => [i.name, 0])),
-        ...prev.quantities
-      }
+      quantities: { ...Object.fromEntries(TRAY_ITEMS.map(i => [i.name, 0])), ...prev.quantities }
     }));
     setSweetState(prev => ({
       ...prev,
-      quantities: {
-        ...Object.fromEntries(SWEET_ITEMS.map(i => [i.name, 0])),
-        ...prev.quantities
-      }
+      quantities: { ...Object.fromEntries(SWEET_ITEMS.map(i => [i.name, 0])), ...prev.quantities }
     }));
   }, []);
 
   const updateGlobalQuantity = (name: string, category: string, delta: number) => {
     const update = (prev: SpecialOrderState) => ({
       ...prev,
-      quantities: {
-        ...prev.quantities,
-        [name]: Math.max(0, (prev.quantities[name] || 0) + delta)
-      }
+      quantities: { ...prev.quantities, [name]: Math.max(0, (prev.quantities[name] || 0) + delta) }
     });
-
     if (category === 'sandwiches') setSandwichState(update);
     else if (category === 'trays') setTrayState(update);
     else if (category === 'sweets') setSweetState(update);
   };
 
   const removeGlobalItem = (name: string, category: string) => {
-    const reset = (prev: SpecialOrderState) => ({
-      ...prev,
-      quantities: { ...prev.quantities, [name]: 0 }
-    });
-
+    const reset = (prev: SpecialOrderState) => ({ ...prev, quantities: { ...prev.quantities, [name]: 0 } });
     if (category === 'sandwiches') setSandwichState(reset);
     else if (category === 'trays') setTrayState(reset);
     else if (category === 'sweets') setSweetState(reset);
@@ -81,17 +67,10 @@ const App: React.FC = () => {
     return calc(sandwichState, SANDWICH_ITEMS) + calc(trayState, TRAY_ITEMS) + calc(sweetState, SWEET_ITEMS);
   }, [sandwichState, trayState, sweetState]);
 
-  const globalTotal = useMemo(() => {
-    return subtotal > 0 ? subtotal + DELIVERY_FEE : 0;
-  }, [subtotal]);
-
-  const totalItemCount = useMemo(() => {
-    const allQtys = [...Object.values(sandwichState.quantities), ...Object.values(trayState.quantities), ...Object.values(sweetState.quantities)] as number[];
-    return allQtys.reduce((a, b) => a + b, 0);
-  }, [sandwichState, trayState, sweetState]);
+  const globalTotal = useMemo(() => subtotal > 0 ? subtotal + DELIVERY_FEE : 0, [subtotal]);
 
   const fullOrderSummary = useMemo(() => {
-    const summary: { name: string; quantity: number; price: number; bread?: string; category: string }[] = [];
+    const summary: any[] = [];
     SANDWICH_ITEMS.forEach(item => {
       const q = sandwichState.quantities[item.name] || 0;
       if (q > 0) summary.push({ name: item.name, quantity: q, price: item.price, bread: sandwichState.breadChoices?.[item.name], category: 'sandwiches' });
@@ -107,20 +86,59 @@ const App: React.FC = () => {
     return summary;
   }, [sandwichState, trayState, sweetState]);
 
-  const handleFinalSubmit = (info: any) => {
+  const handleFinalSubmit = async (info: any) => {
     if (!info.name || !info.phone || !info.address) {
       alert('يا عم لازم تكتب بياناتك عشان نجيلك!');
       return;
     }
-    setShowSuccess(true);
-    setTimeout(() => {
-      setShowSuccess(false);
-      setIsGlobalSummaryOpen(false);
-      setSandwichState({ quantities: Object.fromEntries(SANDWICH_ITEMS.map(i => [i.name, 0])), hasSecretSauce: false, breadChoices: { 'كبدة إسكندراني': 'baladi', 'سجق بلدي': 'baladi' } });
-      setTrayState({ quantities: Object.fromEntries(TRAY_ITEMS.map(i => [i.name, 0])) });
-      setSweetState({ quantities: Object.fromEntries(SWEET_ITEMS.map(i => [i.name, 0])) });
-    }, 3000);
+    
+    setIsSubmitting(true);
+
+    const orderText = fullOrderSummary
+      .map(item => `- ${item.name} (${item.quantity} قطع) - ${item.price * item.quantity} ج.م ${item.bread ? `[عيش ${item.bread === 'baladi' ? 'بلدي' : 'غربي'}]` : ''}`)
+      .join('\n');
+
+    const payload = {
+      name: info.name,
+      phone: info.phone,
+      address: info.address,
+      order_details: orderText,
+      subtotal: `${subtotal} ج.م`,
+      delivery: `${DELIVERY_FEE} ج.م`,
+      total_amount: `${globalTotal} ج.م`,
+      secret_sauce: sandwichState.hasSecretSauce ? 'نعم' : 'لا'
+    };
+
+    try {
+      const response = await fetch('https://formspree.io/f/xdazllep', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        setShowSuccess(true);
+        setTimeout(() => {
+          setShowSuccess(false);
+          setIsGlobalSummaryOpen(false);
+          setSandwichState({ quantities: Object.fromEntries(SANDWICH_ITEMS.map(i => [i.name, 0])), hasSecretSauce: false, breadChoices: { 'كبدة إسكندراني': 'baladi', 'سجق بلدي': 'baladi' } });
+          setTrayState({ quantities: Object.fromEntries(TRAY_ITEMS.map(i => [i.name, 0])) });
+          setSweetState({ quantities: Object.fromEntries(SWEET_ITEMS.map(i => [i.name, 0])) });
+        }, 3000);
+      } else {
+        alert('حصل مشكلة يا عم في الإرسال، جرب تاني');
+      }
+    } catch (error) {
+      alert('في عطل في الشبكة يا عم!');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  const totalItemCount = useMemo(() => {
+    const allQtys = [...Object.values(sandwichState.quantities), ...Object.values(trayState.quantities), ...Object.values(sweetState.quantities)] as number[];
+    return allQtys.reduce((a, b) => a + b, 0);
+  }, [sandwichState, trayState, sweetState]);
 
   return (
     <div className="min-h-screen bg-black text-white font-['Cairo'] relative pb-32">
@@ -211,12 +229,6 @@ const App: React.FC = () => {
                         </div>
                       </>
                     )}
-                    {sandwichState.hasSecretSauce && (
-                      <div className="p-4 bg-[#FAB520]/10 rounded-[1.5rem] border border-[#FAB520]/30 flex justify-between items-center">
-                        <span className="text-lg font-black text-[#FAB520]">صوص أعجوبة السري ✨</span>
-                        <span className="text-lg font-black text-[#FAB520]">10 ج.م</span>
-                      </div>
-                    )}
                   </div>
                   <div className="p-6 bg-white/5 border-t border-white/10 space-y-4">
                     <div className="flex flex-col gap-1">
@@ -234,7 +246,10 @@ const App: React.FC = () => {
                        <input placeholder="رقم تليفونك" className="w-full bg-black border border-white/20 p-4 rounded-xl text-white font-black text-sm focus:border-[#FAB520] outline-none" value={userInfo.phone} onChange={e => setUserInfo({...userInfo, phone: e.target.value})} />
                        <input placeholder="عنوانك فين بالضبط" className="w-full bg-black border border-white/20 p-4 rounded-xl text-white font-black text-sm focus:border-[#FAB520] outline-none" value={userInfo.address} onChange={e => setUserInfo({...userInfo, address: e.target.value})} />
                     </div>
-                    <button onClick={() => handleFinalSubmit(userInfo)} disabled={fullOrderSummary.length === 0} className="w-full bg-[#FAB520] text-black font-black py-5 rounded-[1.5rem] text-lg flex items-center justify-center gap-3 shadow-[0_15px_30px_rgba(250,181,32,0.3)] disabled:opacity-50"><Send className="w-7 h-7" />إتمام الطلب الآن</button>
+                    <button onClick={() => handleFinalSubmit(userInfo)} disabled={fullOrderSummary.length === 0 || isSubmitting} className="w-full bg-[#FAB520] text-black font-black py-5 rounded-[1.5rem] text-lg flex items-center justify-center gap-3 shadow-[0_15px_30px_rgba(250,181,32,0.3)] disabled:opacity-50">
+                      {isSubmitting ? <Loader2 className="w-7 h-7 animate-spin" /> : <Send className="w-7 h-7" />}
+                      {isSubmitting ? 'جاري الإرسال...' : 'إتمام الطلب الآن'}
+                    </button>
                   </div>
                 </>
               )}
@@ -250,6 +265,7 @@ const App: React.FC = () => {
         onUpdateState={(ns) => setSandwichState(ns as SpecialOrderState)} onFinalSubmit={handleFinalSubmit}
         initialItems={SANDWICH_ITEMS} fullOrderSummary={fullOrderSummary} 
         updateGlobalQuantity={updateGlobalQuantity} removeGlobalItem={removeGlobalItem}
+        isSubmitting={isSubmitting}
       />
       <SpecialModal 
         isOpen={activeModal === 'trays'} onClose={() => setActiveModal(null)} title="صواني وطواجن" 
@@ -258,6 +274,7 @@ const App: React.FC = () => {
         onUpdateState={(ns) => setTrayState(ns as SpecialOrderState)} onFinalSubmit={handleFinalSubmit}
         initialItems={TRAY_ITEMS} fullOrderSummary={fullOrderSummary}
         updateGlobalQuantity={updateGlobalQuantity} removeGlobalItem={removeGlobalItem}
+        isSubmitting={isSubmitting}
       />
       <SpecialModal 
         isOpen={activeModal === 'sweets'} onClose={() => setActiveModal(null)} title="حلويات يا عم" 
@@ -266,6 +283,7 @@ const App: React.FC = () => {
         onUpdateState={(ns) => setSweetState(ns as SpecialOrderState)} onFinalSubmit={handleFinalSubmit}
         initialItems={SWEET_ITEMS} fullOrderSummary={fullOrderSummary}
         updateGlobalQuantity={updateGlobalQuantity} removeGlobalItem={removeGlobalItem}
+        isSubmitting={isSubmitting}
       />
       <footer className="py-10 text-center text-gray-600 border-t border-white/5 mt-20">
         <img src={LOGO_URL} className="h-16 mx-auto mb-4 grayscale opacity-30" />
