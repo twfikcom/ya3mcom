@@ -7,7 +7,7 @@
     <title>يا عم | أسرع دليفري في مصر</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Fonts: Lalezar for display, Changa for body -->
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Changa:wght@400;700;800&family=Lalezar&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -26,7 +26,136 @@
 </script>
 </head>
 <body class="bg-black text-white selection:bg-[#FAB520] selection:text-black overflow-x-hidden">
-    <!-- تم نقل شاشة التحميل والخلفية داخل React لضمان التزامن ومنع الاختفاء -->
-    <div id="root"></div>
+
+    <!-- Preloader Screen -->
+    <div id="preloader" class="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center transition-opacity duration-700">
+        <div class="relative flex flex-col items-center">
+            <img src="http://sayedsamkary.com/%D9%8A%D8%A7%D8%B9%D9%85.png" alt="Loading Logo" class="h-32 md:h-48 object-contain animate-pulse-slow">
+            <div class="mt-12 flex flex-col items-center w-full">
+                <div class="w-48 h-1 bg-white/10 rounded-full overflow-hidden mb-3">
+                    <div id="loader-bar" class="h-full bg-[#FAB520] transition-all duration-300 ease-out" style="width: 0%"></div>
+                </div>
+                <p class="text-[#FAB520] font-black text-3xl md:text-5xl font-['Lalezar'] drop-shadow-[0_0_15px_rgba(250,181,32,0.4)]">دستوووووور! 🧞‍♂️</p>
+            </div>
+        </div>
+        <div class="absolute bottom-10 text-white/20 font-bold text-sm tracking-widest uppercase">Ya3m.com Delivery</div>
+    </div>
+
+    <!-- Background Elements -->
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div class="glow-bg absolute -top-1/4 -right-1/4 w-[150%] h-[150%] border-[2px] border-[#FAB520]/5 rounded-full blur-2xl"></div>
+        <div class="scooter absolute text-5xl opacity-30 select-none">🛵💨</div>
+        <div class="floating-item absolute text-4xl opacity-10 select-none" style="top: 20%; right: 10%;">🥪</div>
+        <div class="floating-item absolute text-4xl opacity-10 select-none" style="bottom: 40%; left: 15%;">🥘</div>
+        <div class="floating-item absolute text-4xl opacity-10 select-none" style="top: 50%; right: 20%;">🍟</div>
+    </div>
+
+    <main id="main-content" class="max-w-7xl mx-auto px-4 pt-4 relative z-10 pb-32 opacity-0 transition-opacity duration-1000">
+        <!-- Hero Section -->
+        <header class="relative flex flex-col items-center justify-center text-center py-10 md:py-16 overflow-hidden">
+            <img src="http://sayedsamkary.com/%D9%8A%D8%A7%D8%B9%D9%85.png" alt="Ya3m Logo" class="h-36 md:h-52 object-contain mb-8 drop-shadow-[0_0_40px_rgba(250,181,32,0.4)] transition-transform hover:scale-110 cursor-pointer">
+            <h1 class="text-6xl md:text-8xl font-normal mb-6 leading-[1.1] tracking-tight font-['Lalezar']">
+                أسرع دليفري في <br/> 
+                <span class="text-[#FAB520] drop-shadow-[0_5px_15px_rgba(250,181,32,0.3)]">مصر يا عم!</span>
+            </h1>
+            <div class="flex flex-col items-center gap-4">
+                <div class="bg-white/5 backdrop-blur-md border border-white/10 px-6 py-3 rounded-2xl inline-block shadow-2xl">
+                    <p class="text-xl md:text-2xl text-gray-300 font-bold">كبدة • سجق • حواوشي • طواجن • حلويات</p>
+                </div>
+                <div class="flex items-center gap-2 text-[#FAB520] bg-[#FAB520]/10 px-4 py-2 rounded-full border border-[#FAB520]/20 font-bold text-sm">
+                    <i data-lucide="truck" class="w-4 h-4"></i>
+                    <span>خدمة التوصيل بـ 20 جنيه بس!</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Categories Section -->
+        <section class="mt-12">
+            <h2 class="text-4xl md:text-6xl font-normal text-center mb-12 text-[#FAB520] drop-shadow-[0_0_20px_rgba(250,181,32,0.5)] font-['Lalezar']">عايز تاكل إيه يا عم؟ 🤤</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="category-list">
+                <!-- Category Cards injected via script.js -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Global Cart Drawer -->
+    <div id="cart-drawer-overlay" class="fixed inset-0 z-[1000] hidden">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-xl" onclick="toggleCart()"></div>
+        <div class="relative w-full md:w-[450px] h-full bg-[#0c0c0c] flex flex-col shadow-2xl float-left transition-transform duration-500 translate-x-full" id="cart-drawer">
+            <div class="p-5 md:p-8 flex justify-between items-center border-b border-white/5 bg-black/40 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-[#FAB520]/20 rounded-xl text-[#FAB520]"><i data-lucide="shopping-basket" class="w-6 h-6"></i></div>
+                    <h2 class="text-3xl font-normal font-['Lalezar']">طلباتك يا عم</h2>
+                </div>
+                <button onclick="toggleCart()" class="p-2 bg-white/5 rounded-full hover:bg-red-500/20"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto px-5 py-6 space-y-5 scrollbar-hide" id="cart-items-container">
+                <!-- Cart items injected here -->
+            </div>
+
+            <div id="cart-footer" class="p-5 md:p-8 border-t border-[#FAB520]/20 bg-black/80 space-y-5 pb-10 hidden">
+                <div class="flex justify-between items-end mb-2 px-1">
+                    <div class="flex flex-col">
+                        <span class="text-base font-bold text-gray-500">الحساب كله:</span>
+                        <div class="flex items-center gap-1 text-[10px] text-[#FAB520]/60">
+                            <i data-lucide="alert-circle" class="w-2.5 h-2.5"></i>
+                            <span>شامل التوصيل</span>
+                        </div>
+                    </div>
+                    <span class="text-4xl font-bold text-[#FAB520]" id="cart-total">0 ج.م</span>
+                </div>
+                <form id="order-form" class="space-y-3">
+                    <input required id="form-name" placeholder="اسمك" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-[#FAB520] font-bold text-base">
+                    <input required id="form-phone" type="tel" placeholder="تليفونك" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-[#FAB520] font-bold text-base">
+                    <input required id="form-address" placeholder="العنوان فين بالضبط؟" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-[#FAB520] font-bold text-base">
+                    <textarea id="form-notes" placeholder="عندك ملاحظات للأكيل؟ (اختياري)" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-[#FAB520] font-bold text-base resize-none h-24"></textarea>
+                    <button type="submit" id="submit-btn" class="w-full py-5 bg-[#FAB520] text-black font-bold text-2xl rounded-3xl shadow-xl flex items-center justify-center gap-3 mt-3">
+                        <i data-lucide="send" class="w-8 h-8"></i>
+                        <span>اطلب الآن يا عم!</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Modal -->
+    <div id="modal-overlay" class="fixed inset-0 z-[2000] hidden">
+        <div class="absolute inset-0 bg-black/95 backdrop-blur-2xl" onclick="closeModal()"></div>
+        <div class="relative w-full md:max-w-4xl h-[95dvh] md:h-auto md:max-h-[85vh] bg-[#0c0c0c] md:rounded-[3.5rem] border-t-4 md:border-2 border-[#FAB520] flex flex-col overflow-hidden shadow-[0_0_100px_rgba(250,181,32,0.3)] mx-auto mt-[5dvh] md:mt-[7.5vh] transition-transform duration-500 translate-y-full" id="category-modal">
+            <!-- Modal Content injected here -->
+        </div>
+    </div>
+
+    <!-- Success Screen -->
+    <div id="success-screen" class="fixed inset-0 z-[5000] bg-black hidden flex-col items-center justify-center p-8 text-center">
+        <div class="bg-[#FAB520] p-12 rounded-full mb-8 shadow-[0_0_100px_rgba(250,181,32,0.6)] text-black">
+            <i data-lucide="send" class="w-24 h-24"></i>
+        </div>
+        <h2 class="text-6xl font-normal font-['Lalezar'] text-[#FAB520] mb-4">طلبك طار عندنا!</h2>
+        <p class="text-2xl text-gray-400 font-bold">هيكون عندك خلال 25 دقيقة بالضبط 🛵💨</p>
+    </div>
+
+    <!-- Floating Buttons -->
+    <div class="fixed bottom-6 left-6 md:bottom-10 md:left-10 flex flex-col items-start gap-4 z-[100]">
+        <button onclick="toggleCart()" class="bg-[#FAB520] text-black p-4 md:p-6 rounded-full shadow-[0_15px_40px_rgba(250,181,32,0.6)] flex items-center gap-3 border-4 border-black transition-transform hover:scale-110 active:scale-95">
+            <div class="relative">
+                <i data-lucide="shopping-basket" class="w-6 h-6 md:w-10 md:h-10"></i>
+                <span id="cart-badge" class="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] md:text-sm font-bold w-6 h-6 md:w-8 h-8 rounded-full flex items-center justify-center border-2 border-white hidden">0</span>
+            </div>
+            <span class="text-xl font-bold hidden sm:inline">السلة يا عم</span>
+        </button>
+    </div>
+
+    <a href="https://wa.me/201010373331" target="_blank" class="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-[100] bg-[#25D366] text-white p-4 md:p-6 rounded-full shadow-2xl flex items-center justify-center border-4 border-black transition-transform hover:scale-110 active:scale-90 whatsapp-btn">
+        <i data-lucide="phone" class="w-6 h-6 md:w-10 md:h-10"></i>
+    </a>
+
+    <footer class="py-16 text-center text-gray-700 bg-black/50 border-t border-white/5 mt-12">
+        <img src="http://sayedsamkary.com/%D9%8A%D8%A7%D8%B9%D9%85.png" class="h-16 mx-auto mb-6 grayscale opacity-20" alt="Footer Logo">
+        <p class="font-bold text-xs tracking-widest uppercase">جميع الحقوق محفوظة لـ يا عم . كوم © 2025</p>
+    </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>
