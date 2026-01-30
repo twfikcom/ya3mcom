@@ -32,6 +32,17 @@ h1, h2, h3, .heading-font {
     animation: pulseSlow 3s ease-in-out infinite;
 }
 
+@keyframes dastoorMagic {
+    0%, 100% { transform: translateY(0) scale(1) rotate(0); text-shadow: 0 0 20px rgba(250,181,32,0.8); }
+    25% { transform: translateY(-10px) scale(1.1) rotate(-2deg); text-shadow: 0 0 40px rgba(250,181,32,1); }
+    50% { transform: translateY(0) scale(1.05) rotate(2deg); text-shadow: 0 0 30px rgba(250,181,32,0.9); }
+    75% { transform: translateY(-5px) scale(1.1) rotate(-1deg); text-shadow: 0 0 50px rgba(250,181,32,1); }
+}
+.animate-dastoor {
+    animation: dastoorMagic 2s ease-in-out infinite;
+    display: inline-block;
+}
+
 /* Background Animations */
 @keyframes scooterMove {
     from { transform: translateX(-150px) rotate(0deg); }

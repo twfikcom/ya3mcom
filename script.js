@@ -62,6 +62,7 @@ function startPreloader() {
 // Render Category Cards
 function renderCategories() {
   const container = document.getElementById('category-list');
+  if(!container) return;
   container.innerHTML = CATEGORIES.map((cat, i) => `
     <div onclick="openModal('${cat.id}')" class="category-card cursor-pointer ${cat.color} p-8 md:p-10 rounded-[3rem] flex flex-col items-center justify-center text-center gap-4 group relative shadow-2xl overflow-hidden">
       <div class="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -124,7 +125,7 @@ function openModal(categoryId) {
               ${cat.id === 'sandwiches' && item.name !== 'حواوشي يا عم' ? `
                 <div class="mt-4 pt-4 border-t border-white/5 grid grid-cols-2 gap-3 bread-options ${qty > 0 ? '' : 'hidden'}" id="bread-${item.name}">
                   <button onclick="setBread('${item.name}', 'baladi')" class="bread-btn py-3 rounded-xl font-bold text-base transition-all ${bread === 'baladi' ? 'bread-btn-active' : 'bg-white/5 text-gray-500'}" data-bread="baladi">عيش بلدي</button>
-                  <button onclick="setBread('${item.name}', 'western')" class="bread-btn py-3 rounded-xl font-bold text-base transition-all ${bread === 'western' ? 'bread-btn-active' : 'bg-white/5 text-gray-500'}" data-bread="western">عيش فينو</button>
+                  <button onclick="setBread('${item.name}', 'western')" class="bread-btn py-3 rounded-xl font-bold text-base transition-all ${bread === 'western' ? 'bread-btn-active' : 'bg-white/5 text-gray-500'}" data-bread="western">عيش فينو فرنسي</button>
                 </div>
               ` : ''}
             </div>
@@ -233,8 +234,10 @@ function toggleSecretSauce() {
 function updateCartUI() {
   const badge = document.getElementById('cart-badge');
   const count = Object.values(cart).reduce((sum, item) => sum + item.quantity, 0);
-  badge.innerText = count;
-  badge.style.display = count > 0 ? 'flex' : 'none';
+  if(badge) {
+    badge.innerText = count;
+    badge.style.display = count > 0 ? 'flex' : 'none';
+  }
   renderCart();
 }
 
@@ -242,6 +245,7 @@ function renderCart() {
   const container = document.getElementById('cart-items-container');
   const footer = document.getElementById('cart-footer');
   const totalEl = document.getElementById('cart-total');
+  if(!container) return;
   
   const cartArray = Object.entries(cart);
   
@@ -252,14 +256,14 @@ function renderCart() {
         <p class="text-xl font-bold text-center">السلة لسه مفيهاش حاجة يا عم!</p>
       </div>
     `;
-    footer.classList.add('hidden');
+    if(footer) footer.classList.add('hidden');
   } else {
     container.innerHTML = cartArray.map(([name, item]) => `
       <div class="p-5 bg-white/5 rounded-[2rem] border border-white/5 shadow-inner">
         <div class="flex justify-between items-start mb-3">
           <div>
             <h4 class="font-bold text-xl leading-tight mb-1">${name}</h4>
-            ${item.category === 'sandwiches' && name !== 'حواوشي يا عم' ? `<span class="text-[10px] font-bold text-gray-500 bg-white/5 px-2 py-0.5 rounded-full">خبز ${item.bread === 'baladi' ? 'بلدي' : 'فينو'}</span>` : ''}
+            ${item.category === 'sandwiches' && name !== 'حواوشي يا عم' ? `<span class="text-[10px] font-bold text-gray-500 bg-white/5 px-2 py-0.5 rounded-full">خبز ${item.bread === 'baladi' ? 'بلدي' : 'فينو فرنسي'}</span>` : ''}
           </div>
           <button onclick="updateQty('${name}', -999, 0, '')" class="text-gray-600 hover:text-red-500 transition-colors"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
         </div>
@@ -277,11 +281,11 @@ function renderCart() {
         <span class="text-lg">${DELIVERY_FEE} ج.م</span>
       </div>`;
     
-    footer.classList.remove('hidden');
+    if(footer) footer.classList.remove('hidden');
     
     let subtotal = Object.values(cart).reduce((sum, item) => sum + (item.price * item.quantity), 0);
     if (hasSecretSauce) subtotal += 10;
-    totalEl.innerText = `${subtotal + DELIVERY_FEE} ج.م`;
+    if(totalEl) totalEl.innerText = `${subtotal + DELIVERY_FEE} ج.م`;
   }
   initIcons();
 }
@@ -295,60 +299,63 @@ function updateModalSubtotal() {
 }
 
 // Order Form Submission
-document.getElementById('order-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  
-  const name = document.getElementById('form-name').value;
-  const phone = document.getElementById('form-phone').value;
-  const address = document.getElementById('form-address').value;
-  const notes = document.getElementById('form-notes').value;
-  const btn = document.getElementById('submit-btn');
-  
-  if (!name || !phone || !address) return;
-  
-  btn.disabled = true;
-  btn.innerHTML = `<i data-lucide="loader-2" class="w-8 h-8 loading-spin"></i><span>جاري الطيران...</span>`;
-  initIcons();
-
-  try {
-    const orderDetails = Object.entries(cart).map(([name, item]) => 
-      `- ${name} (${item.quantity}) ${item.category === 'sandwiches' ? `[خبز ${item.bread === 'baladi' ? 'بلدي' : 'فينو'}]` : ''}`
-    ).join('\n');
+const orderForm = document.getElementById('order-form');
+if(orderForm) {
+  orderForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
     
-    let subtotal = Object.values(cart).reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    if (hasSecretSauce) subtotal += 10;
+    const name = document.getElementById('form-name').value;
+    const phone = document.getElementById('form-phone').value;
+    const address = document.getElementById('form-address').value;
+    const notes = document.getElementById('form-notes').value;
+    const btn = document.getElementById('submit-btn');
     
-    const response = await fetch("https://formspree.io/f/xdazllep", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Accept": "application/json" },
-      body: JSON.stringify({
-          الاسم: name,
-          التليفون: phone,
-          العنوان: address,
-          الملاحظات: notes,
-          الطلب: orderDetails,
-          الإجمالي: (subtotal + DELIVERY_FEE) + " ج.م"
-      })
-    });
-
-    if (response.ok) {
-      document.getElementById('success-screen').style.display = 'flex';
-      setTimeout(() => {
-        location.reload();
-      }, 4000);
-    } else {
-      alert('يا عم حصل غلط في الإرسال، جرب تاني!');
+    if (!name || !phone || !address) return;
+    
+    btn.disabled = true;
+    btn.innerHTML = `<i data-lucide="loader-2" class="w-8 h-8 loading-spin"></i><span>جاري الطيران...</span>`;
+    initIcons();
+  
+    try {
+      const orderDetails = Object.entries(cart).map(([name, item]) => 
+        `- ${name} (${item.quantity}) ${item.category === 'sandwiches' ? `[خبز ${item.bread === 'baladi' ? 'بلدي' : 'فينو فرنسي'}]` : ''}`
+      ).join('\n');
+      
+      let subtotal = Object.values(cart).reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      if (hasSecretSauce) subtotal += 10;
+      
+      const response = await fetch("https://formspree.io/f/xdazllep", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+            الاسم: name,
+            التليفون: phone,
+            العنوان: address,
+            الملاحظات: notes,
+            الطلب: orderDetails,
+            الإجمالي: (subtotal + DELIVERY_FEE) + " ج.م"
+        })
+      });
+  
+      if (response.ok) {
+        document.getElementById('success-screen').style.display = 'flex';
+        setTimeout(() => {
+          location.reload();
+        }, 4000);
+      } else {
+        alert('يا عم حصل غلط في الإرسال، جرب تاني!');
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="send" class="w-8 h-8"></i><span>اطلب الآن يا عم!</span>`;
+        initIcons();
+      }
+    } catch (err) {
+      alert('يا عم النت فيه مشكلة، جرب تاني!');
       btn.disabled = false;
       btn.innerHTML = `<i data-lucide="send" class="w-8 h-8"></i><span>اطلب الآن يا عم!</span>`;
       initIcons();
     }
-  } catch (err) {
-    alert('يا عم النت فيه مشكلة، جرب تاني!');
-    btn.disabled = false;
-    btn.innerHTML = `<i data-lucide="send" class="w-8 h-8"></i><span>اطلب الآن يا عم!</span>`;
-    initIcons();
-  }
-});
+  });
+}
 
 // Start Everything
 window.onload = () => {
