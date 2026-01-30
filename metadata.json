@@ -1,0 +1,7 @@
+{
+  "name": "Ya3m Food Delivery",
+  "description": "A high-energy, animated food delivery platform with a bold yellow and black aesthetic and AI-powered recommendations.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
