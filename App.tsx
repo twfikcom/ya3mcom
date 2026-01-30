@@ -9,6 +9,8 @@ import { SpecialOrderState } from './types';
 import { Utensils, IceCream, Sandwich, ShoppingBasket, X, Trash2, Send, Plus, Minus, Truck, Loader2, Sparkles, MessageCircle } from 'lucide-react';
 
 const DELIVERY_FEE = 20;
+const EXTRA_CHEESE_PRICE = 5;
+const SPICY_PEPPERS_PRICE = 3;
 
 const App: React.FC = () => {
   const [activeModal, setActiveModal] = useState<'sandwiches' | 'trays' | 'sweets' | null>(null);
@@ -20,7 +22,9 @@ const App: React.FC = () => {
   const [sandwichState, setSandwichState] = useState<SpecialOrderState>({
     quantities: Object.fromEntries(SANDWICH_ITEMS.map(i => [i.name, 0])),
     hasSecretSauce: false,
-    breadChoices: {}
+    breadChoices: {},
+    extraCheese: {},
+    spicyPeppers: {}
   });
   
   const [trayState, setTrayState] = useState<SpecialOrderState>({
@@ -49,11 +53,19 @@ const App: React.FC = () => {
   };
 
   const subtotal = useMemo(() => {
-    const calc = (state: SpecialOrderState, items: {name: string, price: number}[]) => {
-      let sum = items.reduce((acc, item) => acc + (item.price * (state.quantities[item.name] || 0)), 0);
+    const calc = (state: SpecialOrderState, items: {name: string, price: number}[], isSandwich: boolean = false) => {
+      let sum = items.reduce((acc, item) => {
+        const qty = state.quantities[item.name] || 0;
+        let itemPrice = item.price;
+        if (isSandwich && qty > 0) {
+          if (state.extraCheese?.[item.name]) itemPrice += EXTRA_CHEESE_PRICE;
+          if (state.spicyPeppers?.[item.name]) itemPrice += SPICY_PEPPERS_PRICE;
+        }
+        return acc + (itemPrice * qty);
+      }, 0);
       return sum;
     };
-    let total = calc(sandwichState, SANDWICH_ITEMS) + calc(trayState, TRAY_ITEMS) + calc(sweetState, SWEET_ITEMS);
+    let total = calc(sandwichState, SANDWICH_ITEMS, true) + calc(trayState, TRAY_ITEMS) + calc(sweetState, SWEET_ITEMS);
     if (sandwichState.hasSecretSauce) total += 10;
     return total;
   }, [sandwichState, trayState, sweetState]);
@@ -69,7 +81,9 @@ const App: React.FC = () => {
         quantity: q, 
         price: item.price, 
         bread: sandwichState.breadChoices?.[item.name] || 'baladi', 
-        category: 'sandwiches' 
+        category: 'sandwiches',
+        extraCheese: sandwichState.extraCheese?.[item.name],
+        spicyPeppers: sandwichState.spicyPeppers?.[item.name]
       });
     });
     TRAY_ITEMS.forEach(item => {
@@ -92,7 +106,18 @@ const App: React.FC = () => {
     setIsSubmitting(true);
 
     const orderText = fullOrderSummary
-      .map(item => `- ${item.name} (${item.quantity} قطع) - ${item.price * item.quantity} ج.م ${item.category === 'sandwiches' ? `[عيش ${item.bread === 'baladi' ? 'بلدي' : 'فينو'}]` : ''}`)
+      .map(item => {
+        let text = `- ${item.name} (${item.quantity} قطع)`;
+        if (item.category === 'sandwiches') {
+          const breadText = item.bread === 'baladi' ? 'بلدي' : 'فينو';
+          const extras = [];
+          if (item.extraCheese) extras.push('جبنة زيادة');
+          if (item.spicyPeppers) extras.push('شطة زيادة');
+          text += ` [عيش ${breadText}${extras.length > 0 ? `, ${extras.join(' + ')}` : ''}]`;
+        }
+        text += ` - ${item.price * item.quantity} ج.م`;
+        return text;
+      })
       .join('\n');
 
     const payload = {
@@ -120,7 +145,13 @@ const App: React.FC = () => {
           setIsGlobalSummaryOpen(false);
           setActiveModal(null);
           // Reset Cart
-          setSandwichState({ quantities: Object.fromEntries(SANDWICH_ITEMS.map(i => [i.name, 0])), hasSecretSauce: false, breadChoices: {} });
+          setSandwichState({ 
+            quantities: Object.fromEntries(SANDWICH_ITEMS.map(i => [i.name, 0])), 
+            hasSecretSauce: false, 
+            breadChoices: {},
+            extraCheese: {},
+            spicyPeppers: {}
+          });
           setTrayState({ quantities: Object.fromEntries(TRAY_ITEMS.map(i => [i.name, 0])) });
           setSweetState({ quantities: Object.fromEntries(SWEET_ITEMS.map(i => [i.name, 0])) });
         }, 4000);
@@ -225,13 +256,17 @@ const App: React.FC = () => {
                           <div key={i} className="flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/10">
                             <div>
                               <p className="font-black">{item.name}</p>
-                              <p className="text-xs text-gray-400 font-bold">
-                                {item.quantity} × {item.price} ج.م 
-                                {item.category === 'sandwiches' && ` - عيش ${item.bread === 'baladi' ? 'بلدي' : 'فينو'}`}
-                              </p>
+                              <div className="flex flex-wrap gap-2 items-center">
+                                <p className="text-xs text-gray-400 font-bold">
+                                  {item.quantity} × {item.price} ج.م 
+                                  {item.category === 'sandwiches' && ` - عيش ${item.bread === 'baladi' ? 'بلدي' : 'فينو'}`}
+                                </p>
+                                {item.extraCheese && <span className="text-[10px] bg-[#FAB520]/20 text-[#FAB520] px-1.5 py-0.5 rounded font-black">+ جبنة</span>}
+                                {item.spicyPeppers && <span className="text-[10px] bg-red-500/20 text-red-500 px-1.5 py-0.5 rounded font-black">+ شطة</span>}
+                              </div>
                             </div>
                             <div className="flex items-center gap-4">
-                              <span className="font-black text-[#FAB520]">{item.quantity * item.price} ج.م</span>
+                              <span className="font-black text-[#FAB520]">{(item.price + (item.extraCheese ? EXTRA_CHEESE_PRICE : 0) + (item.spicyPeppers ? SPICY_PEPPERS_PRICE : 0)) * item.quantity} ج.م</span>
                               <button onClick={() => removeGlobalItem(item.name, item.category)} className="text-red-500 hover:scale-110 active:scale-90 transition-all"><Trash2 className="w-5 h-5" /></button>
                             </div>
                           </div>

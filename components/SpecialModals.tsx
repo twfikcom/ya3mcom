@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, CheckCircle2, ListChecks, Plus, Minus, Trash2, Truck, Loader2, Sparkles } from 'lucide-react';
+import { X, Send, CheckCircle2, ListChecks, Plus, Minus, Trash2, Truck, Loader2, Sparkles, Flame, Cookie } from 'lucide-react';
 
 interface ModalProps {
   isOpen: boolean;
@@ -17,10 +17,20 @@ interface ModalProps {
     quantities: Record<string, number>; 
     hasSecretSauce?: boolean;
     breadChoices?: Record<string, 'baladi' | 'western'>;
+    extraCheese?: Record<string, boolean>;
+    spicyPeppers?: Record<string, boolean>;
   };
   onUpdateState: (newState: any) => void;
   onFinalSubmit: (userInfo: any) => void;
-  fullOrderSummary: { name: string; quantity: number; price: number; bread?: string; category: string }[];
+  fullOrderSummary: { 
+    name: string; 
+    quantity: number; 
+    price: number; 
+    bread?: string; 
+    category: string;
+    extraCheese?: boolean;
+    spicyPeppers?: boolean;
+  }[];
   updateGlobalQuantity: (name: string, category: string, delta: number) => void;
   removeGlobalItem: (name: string, category: string) => void;
   isSubmitting?: boolean;
@@ -68,6 +78,16 @@ const SpecialModal: React.FC<ModalProps> = ({
       breadChoices: {
         ...(persistentState.breadChoices || {}),
         [name]: choice
+      }
+    });
+  };
+
+  const handleToggleOption = (name: string, option: 'extraCheese' | 'spicyPeppers') => {
+    onUpdateState({
+      ...persistentState,
+      [option]: {
+        ...(persistentState[option] || {}),
+        [name]: !persistentState[option]?.[name]
       }
     });
   };
@@ -132,9 +152,11 @@ const SpecialModal: React.FC<ModalProps> = ({
 
             <div className="space-y-4">
               {initialItems.map((item) => {
-                const isBreadEligible = item.name.includes('كبدة') || item.name.includes('سجق') || item.name.includes('حواوشي');
+                const isSandwich = type === 'sandwiches';
                 const currentChoice = persistentState.breadChoices?.[item.name] || 'baladi';
                 const qty = persistentState.quantities[item.name] || 0;
+                const hasCheese = persistentState.extraCheese?.[item.name] || false;
+                const hasPeppers = persistentState.spicyPeppers?.[item.name] || false;
                 
                 return (
                   <div key={item.name} className={`flex flex-col gap-4 p-5 rounded-[2rem] border transition-all ${qty > 0 ? 'bg-white/5 border-[#FAB520]' : 'bg-white/5 border-white/5'}`}>
@@ -150,8 +172,9 @@ const SpecialModal: React.FC<ModalProps> = ({
                       </div>
                     </div>
                     
-                    {isBreadEligible && qty > 0 && (
-                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="flex flex-col gap-3 pt-3 border-t border-white/5 overflow-hidden">
+                    {isSandwich && qty > 0 && (
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="flex flex-col gap-4 pt-3 border-t border-white/5 overflow-hidden">
+                        {/* Bread Selection */}
                         <div className="flex bg-black/40 rounded-2xl p-1.5 gap-2">
                           <button 
                             onClick={() => handleBreadChoice(item.name, 'baladi')} 
@@ -166,6 +189,24 @@ const SpecialModal: React.FC<ModalProps> = ({
                           >
                             {currentChoice === 'western' && <CheckCircle2 className="w-4 h-4" />}
                             عيش فينو
+                          </button>
+                        </div>
+
+                        {/* Extras Selection */}
+                        <div className="grid grid-cols-2 gap-3">
+                          <button 
+                            onClick={() => handleToggleOption(item.name, 'extraCheese')}
+                            className={`flex items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all text-xs font-black ${hasCheese ? 'bg-[#FAB520]/20 border-[#FAB520] text-[#FAB520]' : 'bg-black/20 border-white/5 text-gray-500'}`}
+                          >
+                            <Cookie className={`w-4 h-4 ${hasCheese ? 'animate-bounce' : ''}`} />
+                            جبنة زيادة (+5)
+                          </button>
+                          <button 
+                            onClick={() => handleToggleOption(item.name, 'spicyPeppers')}
+                            className={`flex items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all text-xs font-black ${hasPeppers ? 'bg-red-500/20 border-red-500 text-red-500' : 'bg-black/20 border-white/5 text-gray-500'}`}
+                          >
+                            <Flame className={`w-4 h-4 ${hasPeppers ? 'animate-pulse text-red-500' : ''}`} />
+                            شطة زيادة (+3)
                           </button>
                         </div>
                       </motion.div>
@@ -213,7 +254,12 @@ const SpecialModal: React.FC<ModalProps> = ({
                     <div key={idx} className="flex justify-between p-3 bg-white/5 rounded-2xl border border-white/10">
                       <div>
                         <p className="font-black text-white text-sm">{item.name}</p>
-                        <p className="text-[10px] text-gray-500 font-bold">{item.quantity} × {item.price} ج.م {item.bread && ` - عيش ${item.bread === 'baladi' ? 'بلدي' : 'فينو'}`}</p>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          <span className="text-[10px] text-gray-500 font-bold">{item.quantity} × {item.price} ج.م</span>
+                          {item.bread && <span className="text-[10px] bg-white/10 px-1 rounded text-white">عيش {item.bread === 'baladi' ? 'بلدي' : 'فينو'}</span>}
+                          {item.extraCheese && <span className="text-[10px] bg-[#FAB520]/20 text-[#FAB520] px-1 rounded">+جبنة</span>}
+                          {item.spicyPeppers && <span className="text-[10px] bg-red-500/20 text-red-500 px-1 rounded">+شطة</span>}
+                        </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <button onClick={() => updateGlobalQuantity(item.name, item.category, -1)} className="p-1 text-[#FAB520]"><Minus className="w-4 h-4" /></button>

@@ -23,6 +23,8 @@ export interface SpecialOrderState {
   quantities: Record<string, number>;
   hasSecretSauce?: boolean;
   breadChoices?: Record<string, 'baladi' | 'western'>;
+  extraCheese?: Record<string, boolean>;
+  spicyPeppers?: Record<string, boolean>;
 }
 
 export type Category = 'الكل' | 'بيتزا' | 'برجر' | 'مشويات' | 'حلويات' | 'سندوتشات';
