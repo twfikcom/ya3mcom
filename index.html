@@ -9,49 +9,175 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Cairo', sans-serif;
-            background-color: #000000;
-            color: #ffffff;
-            overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: #FAB520; border-radius: 10px; }
-
-        /* Smooth momentum scrolling for iOS */
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
-        
-        #root {
-            min-height: 100vh;
-        }
-    </style>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css">
 <script type="importmap">
 {
   "imports": {
-    "@google/genai": "https://esm.sh/@google/genai@^1.38.0",
     "react": "https://esm.sh/react@^19.2.4",
-    "react-dom": "https://esm.sh/react-dom@^19.2.4",
-    "react-dom/client": "https://esm.sh/react-dom@^19.2.4/client",
-    "framer-motion": "https://esm.sh/framer-motion@^12.29.2",
-    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
     "react/": "https://esm.sh/react@^19.2.4/",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.4/"
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.38.0",
+    "framer-motion": "https://esm.sh/framer-motion@^12.29.2"
   }
 }
 </script>
 </head>
-<body>
-    <div id="root"></div>
-    <script type="module" src="index.tsx"></script>
+<body class="bg-black text-white selection:bg-[#FAB520] selection:text-black overflow-x-hidden">
+
+    <!-- Background Entertainment -->
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div class="glow-bg absolute -top-1/4 -right-1/4 w-[150%] h-[150%] border-[2px] border-[#FAB520]/5 rounded-full blur-2xl"></div>
+        <div class="scooter absolute top-[20%] text-5xl opacity-30 select-none">🛵💨</div>
+        <div class="floating-item absolute text-4xl opacity-10 select-none" style="top: 20%; right: 10%;">🥪</div>
+        <div class="floating-item absolute text-4xl opacity-10 select-none" style="bottom: 40%; left: 15%;">🥘</div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 pt-4 relative z-10 pb-32">
+        <!-- Hero Section -->
+        <header class="relative flex flex-col items-center justify-center text-center py-10 md:py-16">
+            <img id="logo" src="http://sayedsamkary.com/%D9%8A%D8%A7%D8%B9%D9%85.png" alt="Ya3m Logo" class="h-36 md:h-52 object-contain mb-8 drop-shadow-[0_0_40px_rgba(250,181,32,0.4)] cursor-pointer">
+            <h1 class="text-5xl md:text-7xl font-black mb-6 leading-[1.1]">
+                أسرع دليفري في <br/> 
+                <span class="text-[#FAB520] drop-shadow-[0_5px_15px_rgba(250,181,32,0.3)]">مصر يا عم!</span>
+            </h1>
+            <div class="bg-white/5 backdrop-blur-md border border-white/10 px-6 py-3 rounded-2xl inline-block shadow-2xl mb-4">
+                <p class="text-lg md:text-xl text-gray-300 font-black">كبدة • سجق • حواوشي • طواجن • حلويات</p>
+            </div>
+            <div class="flex items-center gap-2 text-[#FAB520] bg-[#FAB520]/10 px-4 py-2 rounded-full border border-[#FAB520]/20 font-bold text-sm">
+                <i data-lucide="truck" class="w-4 h-4"></i>
+                <span>خدمة التوصيل بـ 20 جنيه بس!</span>
+            </div>
+        </header>
+
+        <!-- Category Grid -->
+        <section class="mt-12">
+            <h2 class="text-3xl md:text-5xl font-black text-center mb-12 text-[#FAB520]">عايز تاكل إيه يا عم؟ 🤤</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Sandwiches -->
+                <div onclick="openModal('sandwiches')" class="category-card cursor-pointer bg-[#FAB520] p-8 md:p-10 rounded-[3rem] flex flex-col items-center justify-center text-center gap-4 relative shadow-2xl overflow-hidden">
+                    <i data-lucide="sandwich" class="w-20 h-20 md:w-24 md:h-24 text-black"></i>
+                    <h3 class="text-3xl font-black text-black">ركن السندوتشات</h3>
+                    <div class="bg-black text-[#FAB520] px-8 py-3 rounded-xl font-black text-lg">دخول المتجر</div>
+                </div>
+                <!-- Trays -->
+                <div onclick="openModal('trays')" class="category-card cursor-pointer bg-white/5 border-4 border-[#FAB520] p-8 md:p-10 rounded-[3rem] flex flex-col items-center justify-center text-center gap-4 relative shadow-2xl overflow-hidden">
+                    <i data-lucide="utensils" class="w-20 h-20 md:w-24 md:h-24 text-[#FAB520]"></i>
+                    <h3 class="text-3xl font-black text-[#FAB520]">صواني وطواجن</h3>
+                    <div class="bg-[#FAB520] text-black px-8 py-3 rounded-xl font-black text-lg">دخول المتجر</div>
+                </div>
+                <!-- Sweets -->
+                <div onclick="openModal('sweets')" class="category-card cursor-pointer bg-white/10 p-8 md:p-10 rounded-[3rem] flex flex-col items-center justify-center text-center gap-4 relative shadow-2xl overflow-hidden">
+                    <i data-lucide="ice-cream" class="w-20 h-20 md:w-24 md:h-24 text-white"></i>
+                    <h3 class="text-3xl font-black text-white">حلويات يا عم</h3>
+                    <div class="bg-[#FAB520] text-black px-8 py-3 rounded-xl font-black text-lg">دخول المتجر</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Floating Cart Button -->
+    <button onclick="toggleCart(true)" class="fixed bottom-6 left-6 md:bottom-10 md:left-10 z-[100] bg-[#FAB520] text-black p-4 md:p-6 rounded-full shadow-2xl flex items-center gap-3 border-4 border-black transition-transform active:scale-90">
+        <div class="relative">
+            <i data-lucide="shopping-basket" class="w-6 h-6 md:w-10 md:h-10"></i>
+            <span id="cart-badge" class="hidden absolute -top-2 -right-2 bg-red-600 text-white text-[10px] md:text-sm font-black w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center border-2 border-white">0</span>
+        </div>
+        <span class="text-xl font-black hidden sm:inline">السلة يا عم</span>
+    </button>
+
+    <!-- Category Modal -->
+    <div id="modal-overlay" class="hidden fixed inset-0 z-[2000] flex items-end md:items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 bg-black/95 backdrop-blur-2xl" onclick="closeModal()"></div>
+        <div id="modal-content" class="relative w-full md:max-w-4xl h-[95dvh] md:h-auto md:max-h-[85vh] bg-[#0c0c0c] md:rounded-[3.5rem] border-t-4 md:border-2 border-[#FAB520] flex flex-col overflow-hidden shadow-2xl translate-y-full transition-transform duration-500">
+            <div class="relative h-40 md:h-64 shrink-0">
+                <img id="modal-img" src="" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-[#0c0c0c] via-transparent"></div>
+                <button onclick="closeModal()" class="absolute top-6 left-6 p-3 bg-black/50 rounded-full text-white backdrop-blur-md z-20"><i data-lucide="x" class="w-6 h-6"></i></button>
+                <div class="absolute bottom-6 right-8 z-10">
+                    <h2 id="modal-title" class="text-2xl md:text-5xl font-black text-white drop-shadow-lg"></h2>
+                </div>
+            </div>
+            <div id="modal-items" class="flex-1 overflow-y-auto px-5 md:px-10 py-6 space-y-6 scrollbar-hide">
+                <!-- Items injected here -->
+            </div>
+            <div class="p-6 md:p-10 bg-black/95 backdrop-blur-md border-t border-white/5 shrink-0 shadow-2xl">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-5">
+                    <div class="flex flex-col items-center md:items-start">
+                        <span class="text-gray-500 font-bold text-base">إجمالي القسم:</span>
+                        <div class="flex flex-col">
+                            <span id="modal-total" class="text-4xl font-black text-[#FAB520]">0 ج.م</span>
+                            <div class="flex items-center gap-1 text-[10px] text-gray-400 mt-1">
+                                <i data-lucide="truck" class="w-2.5 h-2.5"></i>
+                                <span>يضاف 20 ج.م مصاريف توصيل</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 w-full md:w-auto">
+                        <button onclick="closeModal()" class="flex-1 md:px-10 py-4 bg-white/5 border border-white/10 rounded-2xl font-black text-lg">تكملة الطلب</button>
+                        <button onclick="toggleCart(true); closeModal();" class="flex-1 md:px-10 py-4 bg-[#FAB520] text-black rounded-2xl font-black text-xl shadow-lg active:scale-95 transition-transform">تثبيت الأكلة</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Drawer -->
+    <div id="cart-overlay" class="hidden fixed inset-0 z-[3000] flex justify-end items-stretch overflow-hidden">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-xl" onclick="toggleCart(false)"></div>
+        <div id="cart-drawer" class="relative w-full md:w-[450px] h-full bg-[#0c0c0c] flex flex-col shadow-2xl translate-x-full transition-transform duration-500">
+            <div class="p-5 md:p-8 flex justify-between items-center border-b border-white/5 bg-black/40 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-[#FAB520]/20 rounded-xl"><i data-lucide="shopping-basket" class="text-[#FAB520] w-6 h-6"></i></div>
+                    <h2 class="text-2xl font-black">طلباتك يا عم</h2>
+                </div>
+                <button onclick="toggleCart(false)" class="p-2 bg-white/5 rounded-full"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <div id="cart-items-list" class="flex-1 overflow-y-auto px-5 py-6 space-y-5 scrollbar-hide">
+                <!-- Cart items injected here -->
+            </div>
+            <div id="cart-checkout" class="hidden p-5 md:p-8 border-t border-[#FAB520]/20 bg-black/80 space-y-5 pb-10">
+                <div class="flex justify-between items-end mb-2">
+                    <div class="flex flex-col">
+                        <span class="text-base font-bold text-gray-500">الحساب كله:</span>
+                        <div class="text-[10px] text-[#FAB520]/60 flex items-center gap-1">
+                            <i data-lucide="alert-circle" class="w-2.5 h-2.5"></i>
+                            <span>شامل التوصيل</span>
+                        </div>
+                    </div>
+                    <span id="cart-final-total" class="text-4xl font-black text-[#FAB520]">0 ج.م</span>
+                </div>
+                <form id="order-form" class="space-y-3" onsubmit="handleOrder(event)">
+                    <input required placeholder="اسمك" id="user-name" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-[#FAB520] font-black text-base">
+                    <input required type="tel" placeholder="تليفونك" id="user-phone" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-[#FAB520] font-black text-base">
+                    <input required placeholder="العنوان فين بالضبط؟" id="user-address" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-[#FAB520] font-black text-base">
+                    <button type="submit" class="w-full py-5 bg-[#FAB520] text-black font-black text-2xl rounded-3xl shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-transform">
+                        <i data-lucide="send" class="w-8 h-8"></i>
+                        <span>اطلب الآن يا عم!</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Screen -->
+    <div id="success-screen" class="hidden fixed inset-0 z-[5000] bg-black flex flex-col items-center justify-center p-8 text-center">
+        <div class="bg-[#FAB520] p-12 rounded-full mb-8 shadow-[0_0_100px_rgba(250,181,32,0.6)] animate-bounce">
+            <i data-lucide="send" class="w-24 h-24 text-black"></i>
+        </div>
+        <h2 class="text-5xl font-black text-[#FAB520] mb-4">طلبك طار عندنا!</h2>
+        <p class="text-2xl text-gray-400 font-bold">هيكون عندك خلال 25 دقيقة بالضبط 🛵💨</p>
+    </div>
+
+    <footer class="py-16 text-center text-gray-700 bg-black/50 border-t border-white/5">
+        <p class="font-black text-xs tracking-widest">جميع الحقوق محفوظة لـ يا عم . كوم © 2025</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+    </script>
 </body>
 </html>

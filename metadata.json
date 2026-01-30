@@ -1,6 +1,6 @@
 {
-  "name": "Ya3m Food Delivery",
-  "description": "A high-energy, animated food delivery platform with a bold yellow and black aesthetic and AI-powered recommendations.",
+  "name": "Ya3m Food Delivery Static",
+  "description": "A high-energy food delivery platform running as a static site.",
   "requestFramePermissions": [
     "geolocation"
   ]
